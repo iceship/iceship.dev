@@ -1,4 +1,4 @@
-name: Deploy
+name: CI
 
 on:
   push:
@@ -7,12 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
+  check:
     runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write # Deno Deploy OIDC 인증
-      contents: read
 
     steps:
       - name: Checkout repository
@@ -31,10 +27,3 @@ jobs:
 
       - name: Build project (Vite)
         run: deno task build
-
-      - name: Deploy to Deno Deploy
-        uses: denoland/deployctl@v1
-        if: github.ref == 'refs/heads/main'
-        with:
-          project: blog-iceship-dev
-          entrypoint: _fresh/server.js
