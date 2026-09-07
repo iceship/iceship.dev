@@ -13,11 +13,22 @@ export default define.page(function About() {
         기록을 남깁니다.
       </p>
       <ul class="mt-6 space-y-2 text-neutral-700 dark:text-neutral-300">
-        <li>✉️ Email: hello@example.com ← 바꿔줘</li>
+        <li>
+          ✉️ Email:{" "}
+          <a href="mailto:iceship@gmail.com" class="underline">
+            iceship@gmail.com
+          </a>
+        </li>
         <li>
           🐙 GitHub:{" "}
-          <a href="https://github.com" class="underline">github.com/...</a>{" "}
-          ← 바꿔줘
+          <a
+            href="https://github.com/iceship"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline"
+          >
+            github.com/iceship
+          </a>
         </li>
       </ul>
     </main>

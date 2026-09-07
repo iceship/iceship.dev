@@ -1,3 +1,4 @@
+import { HttpError } from "fresh";
 import { Head } from "fresh/runtime";
 import { define } from "../../utils.ts";
 import { getPost, getPosts } from "../../utils/posts.ts";
@@ -7,15 +8,7 @@ export default define.page(async function PostPage(ctx) {
   const post = await getPost(slug);
 
   if (!post) {
-    return (
-      <main class="max-w-[65ch] mx-auto px-5 py-20 text-center">
-        <h1 class="text-2xl font-bold">글이 없어요</h1>
-        <p class="mt-2 text-neutral-500 dark:text-neutral-400">
-          <code>{slug}</code>에 해당하는 포스트를 찾을 수 없습니다.
-        </p>
-        <a href="/blog" class="mt-6 inline-block underline">목록으로 →</a>
-      </main>
-    );
+    throw new HttpError(404, `포스트를 찾을 수 없습니다: ${slug}`);
   }
 
   // 이전/다음 글
@@ -29,6 +22,13 @@ export default define.page(async function PostPage(ctx) {
       <Head>
         <title>{post.title} — iceship.dev</title>
         <meta name="description" content={post.summary} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.summary} />
+        <meta property="og:type" content="article" />
+        <meta
+          property="og:url"
+          content={`https://iceship.dev/blog/${post.slug}`}
+        />
       </Head>
 
       <a
@@ -48,8 +48,8 @@ export default define.page(async function PostPage(ctx) {
 
       <div
         class="prose-blog mt-8"
-        // deno-lint-ignore no-explicit-any react-no-danger
-        dangerouslySetInnerHTML={{ __html: post.contentHtml } as any}
+        // deno-lint-ignore react-no-danger
+        dangerouslySetInnerHTML={{ __html: post.contentHtml }}
       />
 
       <nav class="mt-16 pt-6 border-t border-neutral-200 dark:border-neutral-800 flex justify-between text-sm">

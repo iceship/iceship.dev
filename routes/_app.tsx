@@ -11,6 +11,17 @@ export default define.page(function App({ Component }) {
         <title>iceship.dev</title>
         <meta name="description" content="iceship의 미니멀 개인 블로그" />
         <meta name="color-scheme" content="light dark" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="iceship.dev RSS Feed"
+          href="/rss.xml"
+        />
+        <meta property="og:site_name" content="iceship.dev" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
         <meta
           name="theme-color"
           content="#ffffff"

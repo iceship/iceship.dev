@@ -5,7 +5,14 @@ export function Footer() {
         <span>© 2026 iceship</span>
         <span>
           Built with{" "}
-          <a href="https://fresh.deno.dev" class="underline">Fresh</a>
+          <a
+            href="https://fresh.deno.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline"
+          >
+            Fresh
+          </a>
         </span>
       </div>
     </footer>
