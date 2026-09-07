@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* 스크롤바 유무로 인한 가로 shift 방지: 거터 항상 예약 */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* 미니멀 블로그 본문 타이포 */
 .prose-blog {
   line-height: 1.75;
