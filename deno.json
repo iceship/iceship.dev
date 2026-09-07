@@ -3,7 +3,9 @@
   "tasks": {
     "check": "deno fmt --check . && deno lint . && deno check",
     "dev": "vite",
-    "build": "vite build",
+    "build": "deno task validate:posts && vite build",
+    "validate:posts": "deno run --allow-read=posts scripts/validate-posts.ts",
+    "test": "deno test --allow-read --allow-write tests/",
     "start": "deno serve -A _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update ."
   },

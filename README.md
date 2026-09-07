@@ -190,6 +190,16 @@ deno task start
 
 ### Front-matter 명세
 
+`title`, `date`, `summary`는 필수입니다. 제목과 요약은 비어 있지 않은 문자열,
+날짜는 따옴표로 감싼 `"YYYY-MM-DD"` 형식이어야 합니다. 존재하지 않는 날짜 (예:
+`"2026-02-30"`)는 허용하지 않습니다. `tags`는 생략하거나 문자열 배열로
+작성합니다. 같은 날짜의 글은 파일명(slug) 오름차순으로 정렬합니다.
+
+`deno task validate:posts`로 모든 글을 검사할 수 있습니다. 오류가 있으면
+파일명과 이유를 모두 출력하며, `deno task build`도 이 검사를 먼저 실행합니다.
+CI와 배포 서비스가 같은 빌드 명령을 사용하므로 잘못된 글은 빌드를 통과하지
+못합니다. 검증 및 글 로딩 회귀 테스트는 `deno task test`로 실행합니다.
+
 글 상단에 아래 형식의 YAML Front-matter를 작성합니다:
 
 ````markdown
@@ -230,8 +240,8 @@ console.log(greet("Deno"));
 ### 1. GitHub Actions (`.github/workflows/ci.yml`)
 
 - `main` 브랜치로의 푸시 또는 풀 리퀘스트 생성 시 자동으로 실행됩니다.
-- `deno task check`(포맷, 린트, 타입 검사)와 `deno task build`(Vite 번들링
-  무결성 검증)를 수행하여, 배포 전에 코드 오류를 사전에 차단합니다.
+- `deno task check`(포맷, 린트, 타입 검사), `deno task test`(글 검증 및 로딩
+  테스트), `deno task build`(글 검증 후 Vite 빌드)를 수행합니다.
 
 ### 2. Deno Deploy 네이티브 연동 (`iceshipdev`)
 

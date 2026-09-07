@@ -25,5 +25,8 @@ jobs:
       - name: Check code (format, lint, typecheck)
         run: deno task check
 
-      - name: Build project (Vite)
+      - name: Test post validation
+        run: deno task test
+
+      - name: Validate posts and build project (Vite)
         run: deno task build

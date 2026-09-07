@@ -1,4 +1,4 @@
-import { extractYaml } from "@std/front-matter";
+import { comparePosts, parsePostSource, postFileError } from "./post-source.ts";
 import { join } from "@std/path";
 import { Marked } from "marked";
 import Prism from "prismjs";
@@ -150,8 +150,8 @@ async function readSlugs(): Promise<string[]> {
         slugs.push(entry.name.replace(/\.md$/, ""));
       }
     }
-  } catch {
-    return [];
+  } catch (error) {
+    throw postFileError(POSTS_DIR, error);
   }
   return slugs;
 }
@@ -174,8 +174,8 @@ export async function getPosts(): Promise<PostMeta[]> {
 
   const posts = await Promise.all(
     slugs.map(async (slug) => {
+      const file = join(POSTS_DIR, `${slug}.md`);
       try {
-        const file = join(POSTS_DIR, `${slug}.md`);
         const stat = await Deno.stat(file);
         const mtime = stat.mtime?.getTime() ?? 0;
 
@@ -185,28 +185,22 @@ export async function getPosts(): Promise<PostMeta[]> {
         }
 
         const raw = await Deno.readTextFile(file);
-        const { attrs, body } = extractYaml<Record<string, unknown>>(raw);
+        const { fields, body } = parsePostSource(raw, file);
         const meta: PostMeta = {
           slug,
-          title: String(attrs.title ?? slug),
-          date: String(attrs.date ?? "1970-01-01"),
-          tags: Array.isArray(attrs.tags) ? attrs.tags.map(String) : [],
-          summary: String(attrs.summary ?? ""),
+          ...fields,
           readingTime: calculateReadingTime(body),
         };
 
         postMetaCache.set(slug, { mtime, meta });
         return meta;
-      } catch {
-        return null;
+      } catch (error) {
+        throw postFileError(file, error);
       }
     }),
   );
 
-  const validPosts = posts.filter((p): p is PostMeta => p !== null);
-  // 최신순 정렬
-  validPosts.sort((a, b) => (a.date < b.date ? 1 : -1));
-  return validPosts;
+  return posts.sort(comparePosts);
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
@@ -214,8 +208,9 @@ export async function getPost(slug: string): Promise<Post | null> {
   let stat: Deno.FileInfo;
   try {
     stat = await Deno.stat(file);
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return null;
+    throw postFileError(file, error);
   }
 
   const mtime = stat.mtime?.getTime() ?? 0;
@@ -227,19 +222,17 @@ export async function getPost(slug: string): Promise<Post | null> {
   let raw: string;
   try {
     raw = await Deno.readTextFile(file);
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return null;
+    throw postFileError(file, error);
   }
 
-  const { attrs, body } = extractYaml<Record<string, unknown>>(raw);
+  const { fields, body } = parsePostSource(raw, file);
   const { contentHtml, toc } = await renderMarkdown(body);
 
   const post: Post = {
     slug,
-    title: String(attrs.title ?? slug),
-    date: String(attrs.date ?? "1970-01-01"),
-    tags: Array.isArray(attrs.tags) ? attrs.tags.map(String) : [],
-    summary: String(attrs.summary ?? ""),
+    ...fields,
     readingTime: calculateReadingTime(body),
     contentHtml,
     toc,
