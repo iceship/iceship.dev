@@ -2,7 +2,7 @@ import { HttpError } from "fresh";
 import { Head } from "fresh/runtime";
 import { define } from "../../utils.ts";
 import { getPost, getPosts } from "../../utils/posts.ts";
-
+import CodeCopyHandler from "../../islands/CodeCopyHandler.tsx";
 export default define.page(async function PostPage(ctx) {
   const slug = ctx.params.slug;
   const post = await getPost(slug);
@@ -29,6 +29,9 @@ export default define.page(async function PostPage(ctx) {
           property="og:url"
           content={`https://iceship.dev/blog/${post.slug}`}
         />
+        <meta property="og:image" content="https://iceship.dev/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://iceship.dev/og-image.png" />
       </Head>
 
       <a
@@ -41,16 +44,50 @@ export default define.page(async function PostPage(ctx) {
       <h1 class="mt-4 text-3xl font-bold tracking-tight leading-tight">
         {post.title}
       </h1>
-      <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-        {post.date}
-        {post.tags.length > 0 && ` · ${post.tags.join(", ")}`}
+      <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
+        <time dateTime={post.date}>{post.date}</time>
+        <span>·</span>
+        <span>{post.readingTime}</span>
+        {post.tags.length > 0 && (
+          <>
+            <span>·</span>
+            <span>{post.tags.join(", ")}</span>
+          </>
+        )}
       </div>
+
+      {post.toc.length > 1 && (
+        <nav class="my-8 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 text-sm">
+          <div class="font-semibold text-neutral-800 dark:text-neutral-200 mb-2.5">
+            목차
+          </div>
+          <ul class="space-y-1.5">
+            {post.toc.map((item) => (
+              <li
+                key={item.id}
+                class={item.level === 3
+                  ? "ml-4 text-neutral-500 dark:text-neutral-400"
+                  : "text-neutral-700 dark:text-neutral-300"}
+              >
+                <a
+                  href={`#${item.id}`}
+                  class="hover:underline hover:text-black dark:hover:text-white"
+                >
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
 
       <div
         class="prose-blog mt-8"
         // deno-lint-ignore react-no-danger
         dangerouslySetInnerHTML={{ __html: post.contentHtml }}
       />
+
+      <CodeCopyHandler />
 
       <nav class="mt-16 pt-6 border-t border-neutral-200 dark:border-neutral-800 flex justify-between text-sm">
         <span>

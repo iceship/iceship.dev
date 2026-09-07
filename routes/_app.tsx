@@ -21,7 +21,11 @@ export default define.page(function App({ Component }) {
         />
         <meta property="og:site_name" content="iceship.dev" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:image" content="https://iceship.dev/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://iceship.dev/og-image.png" />
         <meta
           name="theme-color"
           content="#ffffff"
