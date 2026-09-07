@@ -37,7 +37,11 @@ export default define.page(function App({ Component }) {
           media="(prefers-color-scheme: dark)"
         />
       </head>
-      <body class="bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100">
+      <body
+        f-client-nav
+        f-view-transition
+        class="bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100"
+      >
         <Header />
         <Component />
         <Footer />

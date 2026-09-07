@@ -12,17 +12,17 @@ export default function CodeCopyHandler() {
 
       navigator.clipboard.writeText(code).then(() => {
         const originalText = btn.textContent;
-        btn.textContent = "복사됨 ✓";
+        btn.textContent = "Copied ✓";
         btn.classList.add("text-emerald-400", "border-emerald-500/60");
 
         setTimeout(() => {
-          btn.textContent = originalText || "복사";
+          btn.textContent = originalText || "Copy";
           btn.classList.remove("text-emerald-400", "border-emerald-500/60");
         }, 1800);
       }).catch(() => {
-        btn.textContent = "실패 ✕";
+        btn.textContent = "Failed";
         setTimeout(() => {
-          btn.textContent = "복사";
+          btn.textContent = "Copy";
         }, 1800);
       });
     }

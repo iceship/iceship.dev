@@ -110,7 +110,7 @@ async function renderMarkdown(
         }"><code class="${langClass}">${highlighted}</code></pre>
 <button type="button" class="code-copy-btn absolute top-3 right-3 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity text-xs px-2 py-1 rounded bg-neutral-800/90 text-neutral-300 hover:text-white border border-neutral-700/80 hover:border-neutral-500 backdrop-blur-sm select-none" data-code="${
           escapeHtml(text)
-        }" aria-label="코드 복사">복사</button>
+        }" aria-label="Copy code">Copy</button>
 </div>\n`;
       },
       link(

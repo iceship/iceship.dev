@@ -56,12 +56,18 @@ export default define.page(async function PostPage(ctx) {
         )}
       </div>
 
-      {post.toc.length > 1 && (
-        <nav class="my-8 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 text-sm">
-          <div class="font-semibold text-neutral-800 dark:text-neutral-200 mb-2.5">
-            목차
-          </div>
-          <ul class="space-y-1.5">
+      {post.toc.length > 0 && (
+        <details
+          open
+          class="my-8 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 text-sm group/toc"
+        >
+          <summary class="font-semibold text-neutral-800 dark:text-neutral-200 cursor-pointer select-none flex items-center justify-between">
+            <span>목차</span>
+            <span class="text-xs text-neutral-400 transition-transform group-open/toc:rotate-180">
+              ▼
+            </span>
+          </summary>
+          <ul class="mt-3 space-y-1.5 pt-2 border-t border-neutral-200/60 dark:border-neutral-800">
             {post.toc.map((item) => (
               <li
                 key={item.id}
@@ -78,7 +84,7 @@ export default define.page(async function PostPage(ctx) {
               </li>
             ))}
           </ul>
-        </nav>
+        </details>
       )}
 
       <div

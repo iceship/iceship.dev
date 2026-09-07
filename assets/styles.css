@@ -155,3 +155,60 @@ html {
     border-top-color: #262626;
   }
 }
+
+/* Fresh View Transitions: 페이지 이동 시 부드러운 전환 효과 */
+header {
+  view-transition-name: site-header;
+}
+footer {
+  view-transition-name: site-footer;
+}
+::view-transition-old(site-header),
+::view-transition-new(site-header),
+::view-transition-old(site-footer),
+::view-transition-new(site-footer) {
+  animation: none;
+}
+
+main {
+  view-transition-name: main-content;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+::view-transition-old(main-content) {
+  animation: fade-out 0.12s ease-out;
+}
+
+::view-transition-new(main-content) {
+  animation: fade-in 0.18s ease-in;
+}
+
+/* 접근성: 애니메이션 감소 요청 시 트랜지션 끄기 */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
