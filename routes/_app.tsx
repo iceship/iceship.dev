@@ -1,3 +1,4 @@
+import { Partial } from "fresh/runtime";
 import { define } from "../utils.ts";
 import { Header } from "../components/Header.tsx";
 import { Footer } from "../components/Footer.tsx";
@@ -42,9 +43,11 @@ export default define.page(function App({ Component }) {
         f-view-transition
         class="bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100"
       >
-        <Header />
-        <Component />
-        <Footer />
+        <Partial name="page">
+          <Header />
+          <Component />
+          <Footer />
+        </Partial>
       </body>
     </html>
   );

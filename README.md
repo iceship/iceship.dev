@@ -3,9 +3,8 @@
 [iceship.dev](https://iceship.dev)는 **Deno 2**와 **Fresh 2.x** 기반으로 구축된
 고성능 미니멀 개인 기술 블로그입니다.\
 글은 마크다운 파일(`posts/*.md`)로 관리되며, Git에 커밋하는 것만으로 자동
-배포됩니다. 브라우저로 전송되는 자바스크립트를 최소화하는 **Zero Client JS (100%
-SSR)** 철학을 기본으로 하되, 인터랙션이 꼭 필요한 영역에만 부분적으로
-자바스크립트를 주입하는 **Island 아키텍처**를 채택했습니다.
+배포됩니다. 본문은 **서버 렌더링(SSR)**으로 제공하고, 페이지 전환에는 Fresh의
+Partial 런타임을, 코드 복사에는 **Island 아키텍처**를 사용합니다.
 
 ---
 
@@ -25,11 +24,10 @@ SSR)** 철학을 기본으로 하되, 인터랙션이 꼭 필요한 영역에만
 ## 주요 특징
 
 - **초고속 SSR & 경량 Island 아키텍처**:
-  - 홈(`/`), 목록(`/blog`), 소개(`/about`) 등은 자바스크립트가 0KB인 순수 정적
-    HTML로 즉각 렌더링됩니다.
-  - 코드 복사 인터랙션이 필요한 블로그 상세 페이지(`/blog/[slug]`)에만 Fresh 2의
-    Island(`islands/CodeCopyHandler.tsx`)가 부분 하이드레이션(gzip 기준 약
-    0.4KB)됩니다.
+  - 모든 페이지는 서버에서 HTML로 렌더링되며, 클라이언트 내비게이션을 위한 Fresh
+    런타임도 로드됩니다.
+  - 블로그 상세 페이지(`/blog/[slug]`)에서는 코드 복사용
+    Island(`islands/CodeCopyHandler.tsx`)를 추가로 하이드레이션합니다.
 - **Git 기반 마크다운 관리**: `posts/` 디렉터리에 YAML Front-matter가 포함된
   마크다운 파일을 커밋하면 즉시 반영됩니다.
 - **서버 사이드 신택스 하이라이팅**: Prism.js를 통해 서버 렌더링 시점에 코드
@@ -54,9 +52,9 @@ SSR)** 철학을 기본으로 하되, 인터랙션이 꼭 필요한 영역에만
   - 정식 HTTP 404 상태 코드 반환 및 테마 일치 에러 화면(`_error.tsx`)
 - **태그 필터링 & 활성 링크 감지**: 태그별 글 모아보기(`/blog?tag=...`) 및
   Fresh의 `data-current` 속성을 활용한 현재 활성 메뉴 자동 하이라이트.
-- **네이티브 View Transitions**: Fresh의 `f-client-nav` 및 `f-view-transition`을
-  적용하여, 페이지 간 이동 시 헤더와 푸터의 깜빡임 없이 본문이 부드럽게 전환되는
-  SPA급 사용자 경험을 제공합니다 (JS 0KB 애니메이션, CSS 트랜지션).
+- **네이티브 View Transitions**: `<Partial name="page">`와 `f-client-nav`,
+  `f-view-transition`으로 페이지를 갱신합니다. Fresh 런타임이 전환을 실행하고,
+  CSS가 본문 애니메이션을 정의합니다. RSS는 일반 페이지 이동을 사용합니다.
 - **OS 다크 모드 자동 추종**: 순수 CSS(`prefers-color-scheme`) 기반으로 OS 테마
   설정을 부드럽게 반영합니다.
 
@@ -223,39 +221,75 @@ console.log(greet("Deno"));
 ```
 ````
 
-```
 ---
 
 ## CI/CD 및 배포 파이프라인
 
-본 프로젝트는 **GitHub Actions(CI)**와 **Deno Deploy(배포)**가 각자의 역할에 맞게 분리되어 동작합니다.
+본 프로젝트는 **GitHub Actions(CI)**와 **Deno Deploy(배포)**가 각자의 역할에
+맞게 분리되어 동작합니다.
 
 ### 1. GitHub Actions (`.github/workflows/ci.yml`)
+
 - `main` 브랜치로의 푸시 또는 풀 리퀘스트 생성 시 자동으로 실행됩니다.
-- `deno task check`(포맷, 린트, 타입 검사)와 `deno task build`(Vite 번들링 무결성 검증)를 수행하여, 배포 전에 코드 오류를 사전에 차단합니다.
+- `deno task check`(포맷, 린트, 타입 검사)와 `deno task build`(Vite 번들링
+  무결성 검증)를 수행하여, 배포 전에 코드 오류를 사전에 차단합니다.
 
 ### 2. Deno Deploy 네이티브 연동 (`iceshipdev`)
-- Deno Deploy 대시보드에서 `iceship/iceship.dev` 저장소가 **Fresh 프리셋**으로 연결되어 있습니다.
-- `main` 브랜치에 커밋이 푸시되면 Deno Deploy가 엣지 인프라에서 다음 과정을 자동으로 실행합니다:
+
+- Deno Deploy 대시보드에서 `iceship/iceship.dev` 저장소가 **Fresh 프리셋**으로
+  연결되어 있습니다.
+- `main` 브랜치에 커밋이 푸시되면 Deno Deploy가 엣지 인프라에서 다음 과정을
+  자동으로 실행합니다:
   - **Install command**: `deno install`
   - **Build command**: `deno task build`
   - **Runtime**: `deno serve -A _fresh/server.js` 기반 Anycast 글로벌 배포
-- 별도의 배포 토큰(`deployctl`) 관리 없이도 가장 안정적이고 빠른 제로 다운타임 배포가 이루어집니다.
+- 별도의 배포 토큰(`deployctl`) 관리 없이도 가장 안정적이고 빠른 제로 다운타임
+  배포가 이루어집니다.
 
 ---
 
 ## 설정 및 아키텍처 FAQ
 
 ### Q1. `deno.json`에서 `"nodeModulesDir": "auto"`로 설정한 이유는 무엇인가요?
-Deno 2는 Vite 번들러 및 npm 패키지와 연동할 때 `node_modules` 디렉터리를 참조합니다. `"auto"`로 지정해 두면 별도로 `deno install`을 매번 신경 쓰지 않아도 Deno가 패키지 의존성을 자동으로 동기화하여, CI/CD 환경이나 신규 머신에서 발생할 수 있는 `Could not find a matching package in node_modules` 타입 해석 오류를 방지합니다.
+
+Deno 2는 Vite 번들러 및 npm 패키지와 연동할 때 `node_modules` 디렉터리를
+참조합니다. `"auto"`로 지정해 두면 별도로 `deno install`을 매번 신경 쓰지 않아도
+Deno가 패키지 의존성을 자동으로 동기화하여, CI/CD 환경이나 신규 머신에서 발생할
+수 있는 `Could not find a matching package in node_modules` 타입 해석 오류를
+방지합니다.
 
 ### Q2. `deno.json`의 `exclude`에 `**/_fresh/*`와 `vite.config.ts`가 있는 이유는?
-- **`**/_fresh/*`**: Vite 빌드 결과물이 저장되는 폴더입니다. 수십 개의 최소화(minified)된 번들 파일을 `deno check`나 `deno lint`가 불필요하게 검사하여 속도가 느려지거나 오류를 내는 것을 방지합니다.
-- **`vite.config.ts`**: Vite 전용 빌드 환경 설정 파일이므로, Preact/DOM 중심의 앱 런타임 타입 검사기(`deno check`)의 검사 범위에서 격리하여 경고를 방지합니다.
+
+- **`**/_fresh/*`**: Vite 빌드 결과물이 저장되는 폴더입니다. 수십 개의
+  최소화(minified)된 번들 파일을 `deno check`나 `deno lint`가 불필요하게
+  검사하여 속도가 느려지거나 오류를 내는 것을 방지합니다.
+- **`vite.config.ts`**: Vite 전용 빌드 환경 설정 파일이므로, Preact/DOM 중심의
+  앱 런타임 타입 검사기(`deno check`)의 검사 범위에서 격리하여 경고를
+  방지합니다.
 
 ### Q3. `utils/posts.ts`에서 경로를 `Deno.cwd()` 기준으로 잡은 이유는?
-Fresh 2는 Vite로 빌드된 후 `_fresh/server/server-entry.mjs` 번들 파일로 실행됩니다. `import.meta.url` 기준으로 상대 경로를 계산하면 번들 내부 경로가 어긋나 Deno Deploy 환경에서 포스트 파일을 찾지 못하고 500 에러가 발생할 수 있습니다. 프로젝트 루트를 가리키는 `Deno.cwd()`를 사용해야 로컬과 배포 환경 모두에서 일관되게 `posts/` 디렉터리에 접근할 수 있습니다.
+
+Fresh 2는 Vite로 빌드된 후 `_fresh/server/server-entry.mjs` 번들 파일로
+실행됩니다. `import.meta.url` 기준으로 상대 경로를 계산하면 번들 내부 경로가
+어긋나 Deno Deploy 환경에서 포스트 파일을 찾지 못하고 500 에러가 발생할 수
+있습니다. 프로젝트 루트를 가리키는 `Deno.cwd()`를 사용해야 로컬과 배포 환경
+모두에서 일관되게 `posts/` 디렉터리에 접근할 수 있습니다.
 
 ### Q4. View Transitions와 클라이언트 사이드 네비게이션은 어떻게 동작하나요?
-Fresh 2는 브라우저 네이티브 `View Transitions API`를 프레임워크 차원에서 완벽히 지원합니다. `routes/_app.tsx`의 `<body>`에 `f-client-nav`와 `f-view-transition`을 선언하면, 별도의 무거운 자바스크립트 라우팅/애니메이션 라이브러리 없이도 브라우저가 직접 `document.startViewTransition()`을 수행합니다. 상단 헤더와 하단 푸터는 흔들림 없이 고정되고 본문 영역만 순수 CSS 애니메이션으로 부드럽게 페이드인/아웃 전환됩니다. (미지원 브라우저에서는 일반 링크 이동으로 안전하게 점진적 향상 폴백)
-```
+
+`routes/_app.tsx`의 `<body>`에 `f-client-nav`와 `f-view-transition`을 지정하고,
+갱신할 영역을 `<Partial name="page">`로 감쌉니다. 속성만 추가하고 Partial을
+생략하면 페이지를 갱신할 대상이 없습니다.
+
+Partial에는 헤더, 페이지 본문, 푸터를 포함해 이동 후 활성 메뉴도 갱신합니다.
+Fresh 클라이언트 런타임이 DOM 갱신을 `document.startViewTransition()`으로
+감싸고, CSS는 헤더와 푸터의 페이드 효과를 끄고 본문에 짧은 전환을 적용합니다.
+따라서 이 구성은 JS 0KB가 아닙니다.
+
+View Transitions를 지원하지 않는 브라우저에서는 애니메이션 없이 Partial 이동을
+계속 사용하며, JavaScript가 꺼져 있으면 일반 링크로 이동합니다. OS의 모션 감소
+설정에서는 CSS 애니메이션을 끕니다. RSS처럼 HTML 페이지가 아닌 링크에는
+`f-client-nav={false}`를 지정합니다.
+
+`_layout.tsx`는 필수가 아닙니다. 현재 공통 UI는 `_app.tsx`에서 처리하며, 블로그
+전용 사이드바 등 경로별 공통 구조가 필요해지면 Layout으로 분리할 수 있습니다.

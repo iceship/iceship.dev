@@ -19,6 +19,7 @@ export function Header() {
         </a>
         <a
           href="/rss.xml"
+          f-client-nav={false}
           class="hover:text-black dark:hover:text-white data-[current]:text-black dark:data-[current]:text-white data-[current]:font-semibold"
         >
           RSS
