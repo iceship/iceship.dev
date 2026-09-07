@@ -5,8 +5,6 @@ tags: ["blog"]
 summary: "posts 폴더에 md 파일 하나 만들면 글이 된다"
 ---
 
-# 마크다운으로 글 쓰는 법
-
 `posts/내-글-slug.md` 파일을 만들면 `/blog/내-글-slug`로 바로 보인다.
 
 ## front-matter 규칙

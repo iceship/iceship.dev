@@ -7,9 +7,10 @@ html {
 
 /* 미니멀 블로그 본문 타이포 */
 .prose-blog {
-  line-height: 1.75;
-  font-size: 1.02rem;
+  line-height: 1.85;
+  font-size: 1.0625rem;
   word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .prose-blog h1,
 .prose-blog h2,
@@ -59,8 +60,8 @@ html {
 .prose-blog pre {
   background: #0a0a0a;
   color: #e5e5e5;
-  padding: 1em 1.2em;
-  border-radius: 12px;
+  padding: 2.8em 1.2em 1.2em;
+  border-radius: 6px;
   overflow-x: auto;
   margin: 1.4em 0;
   font-size: 0.88rem;
@@ -77,7 +78,7 @@ html {
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: #737373;
+  color: #a3a3a3;
   font-style: italic;
 }
 .token.punctuation {
@@ -130,7 +131,7 @@ html {
   margin: 2.5em 0;
 }
 .prose-blog img {
-  border-radius: 12px;
+  border-radius: 6px;
   margin: 1.5em 0;
 }
 
@@ -156,59 +157,328 @@ html {
   }
 }
 
-/* Fresh View Transitions: 페이지 이동 시 부드러운 전환 효과 */
-header {
-  view-transition-name: site-header;
+/* Page navigation swaps content directly: no overlapping snapshots or fades. */
+:root {
+  --muted: #626262;
+  --rule: #e5e5e5;
+  --surface: #fafafa;
 }
-footer {
-  view-transition-name: site-footer;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
-::view-transition-old(site-header),
-::view-transition-new(site-header),
-::view-transition-old(site-footer),
-::view-transition-new(site-footer) {
-  animation: none;
+.site-shell {
+  width: min(100% - 3rem, 44rem);
+  margin-inline: auto;
 }
-
-main {
-  view-transition-name: main-content;
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 2.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
 }
-
-@keyframes fade-in {
-  from {
+.site-name {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+.site-nav,
+.site-footer nav {
+  display: flex;
+  gap: 1.5rem;
+}
+.site-nav a,
+.site-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.site-nav a[data-current],
+.site-nav a[data-ancestor] {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.5em;
+}
+a {
+  text-underline-offset: 0.25em;
+}
+a:hover {
+  text-decoration: underline;
+}
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+.page-content {
+  padding-block: 3.5rem 1rem;
+}
+.home-intro {
+  margin-bottom: 3.5rem;
+}
+.home-intro h1,
+.page-heading h1 {
+  font-size: clamp(1.5rem, 4vw, 1.875rem);
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.04em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.home-intro p,
+.page-heading p {
+  margin-top: 0.875rem;
+  color: var(--muted);
+  line-height: 1.8;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.page-heading {
+  margin-bottom: 2rem;
+}
+.page-heading p {
+  font-size: 0.875rem;
+}
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.875rem;
+}
+.section-heading h2 {
+  font-weight: 600;
+}
+.section-heading a {
+  color: var(--muted);
+}
+.post-entry {
+  border-bottom: 1px solid var(--rule);
+}
+.post-link {
+  display: block;
+  padding-block: 1.5rem;
+}
+.post-link:hover {
+  text-decoration: none;
+}
+.post-link:hover h2 {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.post-entry-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  justify-content: space-between;
+}
+.post-entry h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+.post-entry time {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.post-entry p {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  line-height: 1.75;
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+.tag-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-bottom: 1rem;
+}
+.tag-filter a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.tag-filter a[aria-current="page"] {
+  color: inherit;
+  text-decoration: underline;
+}
+.post-title {
+  margin-top: 1.5rem;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.post-body {
+  margin-top: 2.5rem;
+}
+.post-toc {
+  margin-top: 2rem;
+  padding-block: 1rem;
+  border-block: 1px solid var(--rule);
+  font-size: 0.875rem;
+}
+.post-toc summary {
+  min-height: 1.75rem;
+}
+.post-pagination {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.post-pagination > :last-child {
+  text-align: right;
+}
+.site-footer {
+  margin-top: 4rem;
+  padding-block: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.empty-state {
+  padding-block: 2rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.empty-state a {
+  text-decoration: underline;
+}
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 10;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+.prose-blog > :first-child {
+  margin-top: 0;
+}
+.prose-blog pre {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.prose-blog img {
+  max-width: 100%;
+  height: auto;
+}
+.prose-blog table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin-block: 1.5rem;
+  font-size: 0.9375rem;
+}
+.prose-blog th,
+.prose-blog td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+.prose-blog th {
+  background: var(--surface);
+  font-weight: 600;
+}
+.prose-blog .heading-anchor:focus-visible {
+  opacity: 1;
+}
+.code-copy-btn {
+  opacity: 1;
+  min-height: 2rem;
+  min-width: 3rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  .code-copy-btn {
     opacity: 0;
-    transform: translateY(3px);
   }
-  to {
+  .code-block:hover .code-copy-btn,
+  .code-block:focus-within .code-copy-btn {
     opacity: 1;
-    transform: translateY(0);
   }
 }
-
-@keyframes fade-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
+@media (max-width: 520px) {
+  .site-shell {
+    width: calc(100% - 2.5rem);
   }
-  to {
-    opacity: 0;
-    transform: translateY(-3px);
+  .site-header {
+    padding-top: 1.25rem;
+  }
+  .page-content {
+    padding-top: 2.5rem;
+  }
+  .home-intro {
+    margin-bottom: 2.5rem;
+  }
+  .post-entry-heading {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .post-title {
+    font-size: 1.75rem;
+  }
+  .prose-blog {
+    font-size: 1rem;
+  }
+  .site-footer {
+    margin-top: 2.5rem;
   }
 }
-
-::view-transition-old(main-content) {
-  animation: fade-out 0.12s ease-out;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --muted: #a3a3a3;
+    --rule: #292929;
+    --surface: #171717;
+  }
 }
-
-::view-transition-new(main-content) {
-  animation: fade-in 0.18s ease-in;
-}
-
-/* 접근성: 애니메이션 감소 요청 시 트랜지션 끄기 */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
     animation: none !important;
   }
 }

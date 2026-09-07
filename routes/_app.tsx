@@ -40,9 +40,10 @@ export default define.page(function App({ Component }) {
       </head>
       <body
         f-client-nav
-        f-view-transition
+        f-view-transition={false}
         class="bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100"
       >
+        <a href="#main-content" class="skip-link">본문으로 건너뛰기</a>
         <Partial name="page">
           <Header />
           <Component />

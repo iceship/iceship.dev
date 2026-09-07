@@ -3,34 +3,23 @@ import { define } from "../utils.ts";
 
 export default define.page(function About() {
   return (
-    <main class="max-w-[65ch] mx-auto px-5 py-10">
+    <main id="main-content" tabIndex={-1} class="site-shell page-content">
       <Head>
-        <title>About — iceship.dev</title>
+        <title>소개 — iceship.dev</title>
       </Head>
-      <h1 class="text-2xl font-bold tracking-tight">About</h1>
-      <p class="mt-4 text-neutral-600 dark:text-neutral-400 leading-relaxed">
-        Deno Fresh로 운영하는 미니멀 개인 블로그입니다. 관심사, 배운 것, 삽질
-        기록을 남깁니다.
-      </p>
-      <ul class="mt-6 space-y-2 text-neutral-700 dark:text-neutral-300">
-        <li>
-          ✉️ Email:{" "}
-          <a href="mailto:iceship@gmail.com" class="underline">
-            iceship@gmail.com
-          </a>
-        </li>
-        <li>
-          🐙 GitHub:{" "}
-          <a
-            href="https://github.com/iceship"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="underline"
-          >
-            github.com/iceship
-          </a>
-        </li>
-      </ul>
+      <div class="page-heading">
+        <h1>소개</h1>
+      </div>
+      <div class="prose-blog">
+        <p>안녕하세요, iceship입니다.</p>
+        <p>
+          개발하면서 배운 것, 문제를 해결한 과정, 관심 있는 주제를 기록합니다.
+        </p>
+        <p>직접 만들고 꾸준히 다듬어가는 개인 블로그입니다.</p>
+        <p>
+          <a href="mailto:iceship@gmail.com">iceship@gmail.com</a>
+        </p>
+      </div>
     </main>
   );
 });

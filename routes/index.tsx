@@ -4,38 +4,25 @@ import { getPosts } from "../utils/posts.ts";
 import { PostCard } from "../components/PostCard.tsx";
 
 export default define.page(async function Home() {
-  const posts = await getPosts();
-  const recent = posts.slice(0, 5);
+  const recent = (await getPosts()).slice(0, 5);
 
   return (
-    <main class="max-w-[65ch] mx-auto px-5">
+    <main id="main-content" tabIndex={-1} class="site-shell page-content">
       <Head>
-        <title>iceship.dev — 미니멀 블로그</title>
+        <title>iceship.dev</title>
       </Head>
-
-      <section class="py-10">
-        <h1 class="text-2xl font-bold tracking-tight">안녕하세요 👋</h1>
-        <p class="mt-3 text-neutral-600 dark:text-neutral-400 leading-relaxed">
-          Deno Fresh로 운영하는 개인 블로그입니다. 글은 마크다운으로 쓰고
-          GitHub에 커밋합니다.
-        </p>
+      <section class="home-intro">
+        <h1>배우고, 만들고, 기록합니다.</h1>
+        <p>개발하면서 배운 것과 오래 기억하고 싶은 생각을 씁니다.</p>
       </section>
-
-      <section>
-        <div class="flex items-baseline justify-between mb-2">
-          <h2 class="text-lg font-bold">최신 글</h2>
-          <a
-            href="/blog"
-            class="text-sm text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white"
-          >
-            전체 보기 →
+      <section aria-labelledby="recent-posts">
+        <div class="section-heading">
+          <h2 id="recent-posts">최근 글</h2>
+          <a href="/blog">
+            전체 보기 <span aria-hidden="true">↗</span>
           </a>
         </div>
-        {recent.length === 0 && (
-          <p class="text-neutral-500 dark:text-neutral-400">
-            아직 글이 없습니다.
-          </p>
-        )}
+        {recent.length === 0 && <p class="empty-state">아직 글이 없습니다.</p>}
         {recent.map((post) => <PostCard key={post.slug} post={post} />)}
       </section>
     </main>

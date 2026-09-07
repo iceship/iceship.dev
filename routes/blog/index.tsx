@@ -10,44 +10,33 @@ export default define.page(async function BlogIndex(ctx) {
   const tags = [...new Set(all.flatMap((p) => p.tags))].sort();
 
   return (
-    <main class="max-w-[65ch] mx-auto px-5 py-10">
+    <main id="main-content" tabIndex={-1} class="site-shell page-content">
       <Head>
-        <title>{tag ? `#${tag} — ` : ""}Blog — iceship.dev</title>
+        <title>{tag ? `#${tag} — ` : ""}글 — iceship.dev</title>
       </Head>
-
-      <h1 class="text-2xl font-bold tracking-tight mb-2">Blog</h1>
-      <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
-        총 {posts.length}개의 글
-      </p>
-
+      <div class="page-heading">
+        <h1>글</h1>
+        <p>{posts.length}개의 기록</p>
+      </div>
       {tags.length > 0 && (
-        <div class="flex flex-wrap gap-2 mb-8">
-          <a
-            href="/blog"
-            class={`text-sm px-3 py-1 rounded-full border ${
-              !tag
-                ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
-                : "border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white"
-            }`}
-          >
-            전체
-          </a>
+        <nav class="tag-filter" aria-label="태그로 글 필터링">
+          <a href="/blog" aria-current={!tag ? "page" : undefined}>전체</a>
           {tags.map((t) => (
             <a
               key={t}
-              href={`/blog?tag=${t}`}
-              class={`text-sm px-3 py-1 rounded-full border ${
-                tag === t
-                  ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
-                  : "border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white"
-              }`}
+              href={`/blog?tag=${encodeURIComponent(t)}`}
+              aria-current={tag === t ? "page" : undefined}
             >
               #{t}
             </a>
           ))}
-        </div>
+        </nav>
       )}
-
+      {posts.length === 0 && (
+        <p class="empty-state">
+          해당하는 글이 없습니다. <a href="/blog">전체 글 보기</a>
+        </p>
+      )}
       {posts.map((post) => <PostCard key={post.slug} post={post} />)}
     </main>
   );

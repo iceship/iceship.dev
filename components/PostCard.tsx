@@ -2,27 +2,13 @@ import type { PostMeta } from "../utils/posts.ts";
 
 export function PostCard({ post }: { post: PostMeta }) {
   return (
-    <article class="py-6 border-b border-neutral-200 dark:border-neutral-800 last:border-0">
-      <div class="text-sm text-neutral-500 dark:text-neutral-400 mb-1 flex items-center gap-1.5">
-        <time dateTime={post.date}>{post.date}</time>
-        <span>·</span>
-        <span>{post.readingTime}</span>
-        {post.tags.length > 0 && (
-          <>
-            <span>·</span>
-            <span>{post.tags.join(", ")}</span>
-          </>
-        )}
-      </div>
-      <a href={`/blog/${post.slug}`} class="block group">
-        <h2 class="text-xl font-semibold tracking-tight group-hover:underline">
-          {post.title}
-        </h2>
-        {post.summary && (
-          <p class="mt-1.5 text-neutral-600 dark:text-neutral-400 leading-relaxed">
-            {post.summary}
-          </p>
-        )}
+    <article class="post-entry">
+      <a href={`/blog/${post.slug}`} class="post-link">
+        <div class="post-entry-heading">
+          <h2>{post.title}</h2>
+          <time dateTime={post.date}>{post.date}</time>
+        </div>
+        {post.summary && <p>{post.summary}</p>}
       </a>
     </article>
   );

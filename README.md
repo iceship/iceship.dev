@@ -52,9 +52,10 @@ Partial 런타임을, 코드 복사에는 **Island 아키텍처**를 사용합�
   - 정식 HTTP 404 상태 코드 반환 및 테마 일치 에러 화면(`_error.tsx`)
 - **태그 필터링 & 활성 링크 감지**: 태그별 글 모아보기(`/blog?tag=...`) 및
   Fresh의 `data-current` 속성을 활용한 현재 활성 메뉴 자동 하이라이트.
-- **네이티브 View Transitions**: `<Partial name="page">`와 `f-client-nav`,
-  `f-view-transition`으로 페이지를 갱신합니다. Fresh 런타임이 전환을 실행하고,
-  CSS가 본문 애니메이션을 정의합니다. RSS는 일반 페이지 이동을 사용합니다.
+- **즉시 콘텐츠 교체**: `<Partial name="page">`와 `f-client-nav`로 전체 새로고침
+  없이 이동합니다. `f-view-transition={false}`로 스냅샷 교차 페이드와 이동
+  애니메이션을 끄고, 응답 도착 시 본문을 교체합니다. RSS는 일반 이동을
+  사용합니다.
 - **OS 다크 모드 자동 추종**: 순수 CSS(`prefers-color-scheme`) 기반으로 OS 테마
   설정을 부드럽게 반영합니다.
 
@@ -199,8 +200,6 @@ tags: ["deno", "fresh", "typescript"]
 summary: "글 목록 카드 및 SNS 공유 메타태그(og:description)에 노출될 요약문"
 ---
 
-# 포스트 제목
-
 본문은 GitHub Flavored Markdown(GFM) 규격을 따릅니다.
 
 ## 1. 헤딩과 목차
@@ -275,21 +274,16 @@ Fresh 2는 Vite로 빌드된 후 `_fresh/server/server-entry.mjs` 번들 파일�
 있습니다. 프로젝트 루트를 가리키는 `Deno.cwd()`를 사용해야 로컬과 배포 환경
 모두에서 일관되게 `posts/` 디렉터리에 접근할 수 있습니다.
 
-### Q4. View Transitions와 클라이언트 사이드 네비게이션은 어떻게 동작하나요?
+### Q4. 페이지 전환에 애니메이션이 없는 이유는?
 
-`routes/_app.tsx`의 `<body>`에 `f-client-nav`와 `f-view-transition`을 지정하고,
-갱신할 영역을 `<Partial name="page">`로 감쌉니다. 속성만 추가하고 Partial을
-생략하면 페이지를 갱신할 대상이 없습니다.
+`routes/_app.tsx`는 `f-client-nav`와 `<Partial name="page">`로 페이지를
+갱신하며, `f-view-transition={false}`로 View Transitions 애니메이션을 명시적으로
+끕니다. 기존의 이전/다음 화면 교차 페이드와 수직 이동은 글자를 겹쳐 보이게
+했습니다. 현재는 응답이 도착할 때까지 기존 내용을 유지하고, 도착하면 바로
+교체합니다. 네트워크 응답 시간 자체가 사라지는 것은 아닙니다.
 
-Partial에는 헤더, 페이지 본문, 푸터를 포함해 이동 후 활성 메뉴도 갱신합니다.
-Fresh 클라이언트 런타임이 DOM 갱신을 `document.startViewTransition()`으로
-감싸고, CSS는 헤더와 푸터의 페이드 효과를 끄고 본문에 짧은 전환을 적용합니다.
-따라서 이 구성은 JS 0KB가 아닙니다.
+Partial에는 헤더, 본문, 푸터가 포함되며 활성 메뉴도 갱신됩니다. 메뉴는 활성
+상태에서 굵기를 바꾸지 않아 가로 움직임을 줄입니다. JavaScript가 꺼져 있으면
+일반 링크로 이동합니다. RSS는 `f-client-nav={false}`로 일반 이동을 사용합니다.
 
-View Transitions를 지원하지 않는 브라우저에서는 애니메이션 없이 Partial 이동을
-계속 사용하며, JavaScript가 꺼져 있으면 일반 링크로 이동합니다. OS의 모션 감소
-설정에서는 CSS 애니메이션을 끕니다. RSS처럼 HTML 페이지가 아닌 링크에는
-`f-client-nav={false}`를 지정합니다.
-
-`_layout.tsx`는 필수가 아닙니다. 현재 공통 UI는 `_app.tsx`에서 처리하며, 블로그
-전용 사이드바 등 경로별 공통 구조가 필요해지면 Layout으로 분리할 수 있습니다.
+`_layout.tsx`는 필수가 아닙니다. 경로별 공통 UI가 필요해지면 분리할 수 있습니다.

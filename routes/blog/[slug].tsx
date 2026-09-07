@@ -18,7 +18,7 @@ export default define.page(async function PostPage(ctx) {
   const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
   return (
-    <main class="max-w-[65ch] mx-auto px-5 py-10">
+    <main id="main-content" tabIndex={-1} class="site-shell page-content">
       <Head>
         <title>{post.title} — iceship.dev</title>
         <meta name="description" content={post.summary} />
@@ -41,10 +41,10 @@ export default define.page(async function PostPage(ctx) {
         ← 목록
       </a>
 
-      <h1 class="mt-4 text-3xl font-bold tracking-tight leading-tight">
+      <h1 class="post-title">
         {post.title}
       </h1>
-      <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
+      <div class="post-meta">
         <time dateTime={post.date}>{post.date}</time>
         <span>·</span>
         <span>{post.readingTime}</span>
@@ -56,11 +56,8 @@ export default define.page(async function PostPage(ctx) {
         )}
       </div>
 
-      {post.toc.length > 0 && (
-        <details
-          open
-          class="my-8 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 text-sm group/toc"
-        >
+      {post.toc.length >= 3 && (
+        <details class="post-toc group/toc">
           <summary class="font-semibold text-neutral-800 dark:text-neutral-200 cursor-pointer select-none flex items-center justify-between">
             <span>목차</span>
             <span class="text-xs text-neutral-400 transition-transform group-open/toc:rotate-180">
@@ -88,14 +85,14 @@ export default define.page(async function PostPage(ctx) {
       )}
 
       <div
-        class="prose-blog mt-8"
+        class="prose-blog post-body"
         // deno-lint-ignore react-no-danger
         dangerouslySetInnerHTML={{ __html: post.contentHtml }}
       />
 
       <CodeCopyHandler />
 
-      <nav class="mt-16 pt-6 border-t border-neutral-200 dark:border-neutral-800 flex justify-between text-sm">
+      <nav class="post-pagination" aria-label="다른 글">
         <span>
           {prev && (
             <a href={`/blog/${prev.slug}`} class="hover:underline">

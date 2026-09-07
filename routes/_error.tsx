@@ -7,7 +7,11 @@ export default define.page(function ErrorPage(props) {
   const is404 = error instanceof HttpError && error.status === 404;
 
   return (
-    <main class="max-w-[65ch] mx-auto px-5 py-20 text-center">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      class="site-shell page-content text-center"
+    >
       <Head>
         <title>
           {is404 ? "404 — 페이지를 찾을 수 없습니다" : "오류가 발생했습니다"}
