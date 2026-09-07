@@ -1,4 +1,5 @@
 import { extractYaml } from "@std/front-matter";
+import { join } from "jsr:@std/path@^1.1.2";
 import { marked } from "marked";
 
 export interface PostMeta {
@@ -14,11 +15,19 @@ export interface Post extends PostMeta {
   contentHtml: string;
 }
 
-const POSTS_DIR = new URL("../posts/", import.meta.url);
+// NOTE: import.meta.url 기준(../posts) 쓰면 `vite build` 후 _fresh/server 번들에서
+// 경로가 깨져 Deploy에서 500이 난다. Deno.cwd() = 프로젝트 루트 기준이 안전하다.
+function postsDir(): string {
+  return join(Deno.cwd(), "posts");
+}
+
+function postFile(slug: string): string {
+  return join(postsDir(), `${slug}.md`);
+}
 
 async function readSlugs(): Promise<string[]> {
   const slugs: string[] = [];
-  for await (const entry of Deno.readDir(POSTS_DIR)) {
+  for await (const entry of Deno.readDir(postsDir())) {
     if (entry.isFile && entry.name.endsWith(".md")) {
       slugs.push(entry.name.replace(/\.md$/, ""));
     }
@@ -31,9 +40,7 @@ export async function getPosts(): Promise<PostMeta[]> {
   const posts: PostMeta[] = [];
 
   for (const slug of slugs) {
-    const raw = await Deno.readTextFile(
-      new URL(`../posts/${slug}.md`, import.meta.url),
-    );
+    const raw = await Deno.readTextFile(postFile(slug));
     const { attrs } = extractYaml<Record<string, unknown>>(raw);
     posts.push({
       slug,
@@ -52,9 +59,7 @@ export async function getPosts(): Promise<PostMeta[]> {
 export async function getPost(slug: string): Promise<Post | null> {
   let raw: string;
   try {
-    raw = await Deno.readTextFile(
-      new URL(`../posts/${slug}.md`, import.meta.url),
-    );
+    raw = await Deno.readTextFile(postFile(slug));
   } catch {
     return null;
   }
