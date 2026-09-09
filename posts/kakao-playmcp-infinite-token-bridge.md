@@ -5,8 +5,6 @@ summary: "카카오 PlayMCP(카카오맵, 네이버 검색, 나챗방)를 AI 에
 tags: ["playmcp", "mcp", "kakao", "ai-agent", "automation"]
 ---
 
-## TL;DR
-
 카카오에서 제공하는 MCP 게이트웨이 서비스인 **PlayMCP**를 AI 코딩
 에이전트(Antigravity / Gemini CLI)에 연동하여 카카오맵 장소 검색, 네이버 실시간
 검색, 그리고 카카오톡 나와의 채팅방(MemoChat) 전송 파이프라인을 구축했다.
@@ -16,7 +14,7 @@ tags: ["playmcp", "mcp", "kakao", "ai-agent", "automation"]
 버그**를 맞닥뜨렸다. 이를 해결하기 위해 카카오의 **OAuth2 토큰 로테이션(Token
 Rotation)** 메커니즘을 규명하고, 데몬을 거치지 않는 **독립 Stdio
 브릿지(`playmcp-bridge.js`)**와 **6시간 주기 백그라운드 크론**을 결합하여 영구
-무중단 3중 안전 시스템을 완성했다.
+무중단 3중 안전 시스템을 완성한 과정을 정리한다.
 
 ---
 
@@ -262,14 +260,11 @@ Mac이 켜져 있는 동안 장기간 도구를 사용하지 않더라도 Refres
 > **사용자 요청**: _"집근처 오늘 추천 저녁 메뉴 찾아서 나챗방에 보내줘"_
 
 1. 에이전트가 `playmcp`의 `KakaoMap-SearchPlaceByKeywordOpen` 도구를 호출하여
-   자택 인근 마전동/완정역 맛집들을 즉각 검색했다.
+   자택 인근 맛집들을 즉각 검색했다.
 2. 도보 2분 거리의 철판 닭갈비(`한판닭갈비`), 일본식 수제
    라멘(`신짱과후쿠마루`), 정갈한 한식(`다밀`) 3곳을 선정했다.
 3. `KakaotalkChat-MemoChat` 도구를 호출하여 1초 만에 스마트폰 카카오톡 **나와의
    채팅방**으로 요약 내용과 지도 링크를 발송 완료했다.
-
-![카카오톡 나챗방 전송 결과](https://placehold.co/600x300/6366f1/ffffff?text=KakaoTalk+MemoChat+Delivered)
-_에이전트가 탐색한 결과가 1초 만에 모바일 카카오톡 나와의 채팅방에 도착한 모습_
 
 ---
 
