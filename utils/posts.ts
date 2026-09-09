@@ -134,6 +134,21 @@ async function renderMarkdown(
           escapeHtml(sanitizedHref)
         }"${titleAttr}${externalAttrs}>${text}</a>`;
       },
+      image({ href, title, text }: {
+        href: string;
+        title?: string | null;
+        text: string;
+      }) {
+        const sanitizedHref = /^(?:https?:\/\/|\/)/i.test(href) ? href : "";
+        const titleAttr = title ? ` title="${escapeHtml(title)}"` : "";
+        const altText = escapeHtml(text);
+        const caption = altText
+          ? `<figcaption class="image-caption">${altText}</figcaption>`
+          : "";
+        return `<figure class="post-figure"><img src="${
+          escapeHtml(sanitizedHref)
+        }" alt="${altText}"${titleAttr} loading="lazy" decoding="async" class="post-image" />${caption}</figure>\n`;
+      },
     },
   });
 

@@ -236,9 +236,25 @@ html {
   border-top: 1px solid #e5e5e5;
   margin: 2.5em 0;
 }
+.post-figure {
+  margin: 2em 0;
+  text-align: center;
+}
+.post-figure img,
 .prose-blog img {
-  border-radius: 6px;
-  margin: 1.5em 0;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin-inline: auto;
+  border: 1px solid var(--rule);
+}
+.image-caption {
+  margin-top: 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
 }
 
 /* 다크 모드: OS 설정(prefers-color-scheme) 자동 추종 — JS 불필요 */
