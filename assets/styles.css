@@ -174,10 +174,7 @@ html {
   padding: 0;
   color: inherit;
 }
-.prose-blog .code-block {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 12rem;
-}
+/* Keep code block heights in layout from the first render to avoid scroll CLS. */
 
 /* Prism.js 신택스 하이라이팅 토큰 */
 .token.comment,
