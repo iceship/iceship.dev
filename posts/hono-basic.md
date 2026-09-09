@@ -5,7 +5,7 @@ tags: ["hono", "cloudflare", "typescript"]
 summary: "Cloudflare Workers 환경에서 Hono 기본 프로젝트 생성부터 미들웨어, 라우팅, 테스트 설정까지"
 ---
 
-![Hono Basic](/images/blog/hono-basic.png)
+![Hono Basic](/images/blog/hono-basic.webp)
 
 ## Hono Basic
 

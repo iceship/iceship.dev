@@ -5,6 +5,7 @@
     "dev": "vite",
     "build": "deno task validate:posts && vite build",
     "validate:posts": "deno run --allow-read=posts scripts/validate-posts.ts",
+    "optimize:images": "deno run -A scripts/optimize-images.ts",
     "test": "deno test --allow-read --allow-write tests/",
     "start": "deno serve -A _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update ."

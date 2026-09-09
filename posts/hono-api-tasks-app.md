@@ -5,7 +5,7 @@ tags: ["hono", "api", "drizzle", "zod", "openapi"]
 summary: "Hono로 API 서버 백엔드 만들기 (Drizzle, Zod, OpenAPI, Scalar)"
 ---
 
-![Hono API Tasks App](/images/blog/hono-api.png)
+![Hono API Tasks App](/images/blog/hono-api.webp)
 
 ## 프로젝트 기본 설정
 
