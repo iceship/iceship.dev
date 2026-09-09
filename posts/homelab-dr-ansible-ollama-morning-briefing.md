@@ -124,13 +124,13 @@ Ollama(gemma4)가 있다. 평소엔 가끔 진단할 때 말곤 놀고 있어서
 [Home Assistant] ─── 날씨, 실내 온습도, 전력(W) ───┐
 [Proxmox Cluster] ── 4개 노드 상태, PBS 백업(15건) ─┼─▶ [Deno Fresh Dashboard]
 [Service Health] ─── 21개 서비스 가동 상태 ────────┘          │
-                                                               ▼
-                                                       [Ollama (gemma4)]
-                                                     (수집한 데이터 주입)
-                                                               │
-                                                               ▼
-                                                     [Discord Webhook 전송]
-                                                   (매일 아침 08:30 KST 크론)
+                                                          ▼
+                                                  [Ollama (gemma4)]
+                                                   (수집한 데이터 주입)
+                                                         │
+                                                         ▼
+                                               [Discord Webhook 전송]
+                                              (매일 아침 08:30 KST 크론)
 ```
 
 ### 실제로 긁어오는 데이터

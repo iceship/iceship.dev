@@ -141,41 +141,9 @@ Refresh Token을 교체 발급(Token Rotation)**해 주었다. 즉, 90일 만료
 결함이 있는 `mcporter daemon`을 완전히 걷어내고, 토큰 로테이션을 자동화하는
 3계층 아키텍처를 직접 구축했다.
 
-```mermaid
-flowchart TD
-    subgraph Client ["AI Coding Agent"]
-        AGY["Antigravity / Gemini CLI"]
-    end
+![AI 에이전트, 독립 브릿지, 토큰 갱신 스크립트와 6시간 주기 크론을 연결한 PlayMCP 구조](/images/blog/kakao-playmcp-token-bridge.svg)
 
-    subgraph Bridge ["Layer 2: Standalone Bridge"]
-        PB["playmcp-bridge.js (Stdio)"]
-        Check{"만료 2시간 전 or 401?"}
-    end
-
-    subgraph Scripts ["Layer 1: Auto-Refresh Script"]
-        RS["refresh-token.sh"]
-        CRED[("~/.mcporter/credentials.json")]
-    end
-
-    subgraph Cron ["Layer 3: System Cron"]
-        CRON["0 */6 * * * (6시간 주기)"]
-    end
-
-    subgraph Kakao ["Kakao PlayMCP Cloud"]
-        AUTH["playauth.kakao.com (OAuth2)"]
-        GW["playmcp.kakao.com/mcp (Gateway)"]
-    end
-
-    AGY <-->|JSON-RPC Stdio| PB
-    PB -->|도구 실행 요청| GW
-    PB -.->|필요 시 온더플라이 호출| Check
-    Check -- Yes --> RS
-    CRON -->|정기 실행| RS
-    RS -->|토큰 갱신 & 회전| AUTH
-    AUTH -->|New Access & Refresh| RS
-    RS -->|동기화| CRED
-    CRED -.->|최신 토큰 읽기| PB
-```
+[흐름도 크게 보기](/images/blog/kakao-playmcp-token-bridge.svg)
 
 ### 계층 1: 토큰 회전 갱신 스크립트 (`refresh-token.sh`)
 

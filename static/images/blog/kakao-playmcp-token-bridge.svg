@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1030" viewBox="0 0 1080 1030" role="img" aria-labelledby="title desc">
+  <title id="title">Kakao PlayMCP 토큰 자동 갱신 구조</title>
+  <desc id="desc">AI 에이전트와 독립 Stdio 브릿지가 JSON-RPC로 통신한다. 브릿지는 PlayMCP 게이트웨이에 도구를 요청하고, 만료 2시간 전이나 401 응답 시 갱신 스크립트를 실행한다. 6시간 주기 크론도 같은 스크립트를 실행한다. 스크립트는 OAuth2 서버에서 Access 및 Refresh Token을 갱신해 credentials.json에 저장하며 브릿지가 최신 토큰을 읽는다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 0 8 4 0 8Z" fill="#64748b"/></marker>
+    <marker id="blue-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#2563eb"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; fill: #172033; }
+      .group { stroke-width: 1.5; }
+      .heading { font-size: 18px; font-weight: 700; }
+      .node { fill: #fff; stroke: #94a3b8; stroke-width: 1.5; }
+      .label { font-size: 20px; text-anchor: middle; }
+      .small { font-size: 16px; text-anchor: middle; fill: #475569; }
+      .edge { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrow); stroke-linejoin: round; }
+      .refresh { stroke: #2563eb; marker-end: url(#blue-arrow); }
+      .dashed { stroke-dasharray: 6 5; }
+      .edge-label { font-size: 17px; text-anchor: middle; paint-order: stroke; stroke: #f8fafc; stroke-width: 7px; stroke-linejoin: round; }
+    </style>
+  </defs>
+  <rect width="1080" height="1030" rx="20" fill="#f8fafc"/>
+  <text x="48" y="50" font-size="26" font-weight="750">PlayMCP · 토큰 자동 갱신 구조</text>
+  <text x="48" y="80" font-size="17" fill="#475569">도구 호출은 브릿지가, 토큰 갱신은 공통 스크립트가 담당한다.</text>
+
+  <rect class="group" x="88" y="116" width="452" height="140" rx="16" fill="#eef2ff" stroke="#c7d2fe"/>
+  <text class="heading" x="108" y="148">AI Coding Agent</text>
+  <rect class="node" x="120" y="170" width="388" height="58" rx="10"/>
+  <text class="label" x="314" y="205">Antigravity / Gemini CLI</text>
+
+  <rect class="group" x="654" y="116" width="378" height="140" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="heading" x="674" y="148">Layer 3 · System Cron</text>
+  <rect class="node" x="676" y="170" width="334" height="58" rx="10"/>
+  <text class="label" x="843" y="205">0 */6 * * * · 6시간 주기</text>
+
+  <rect class="group" x="88" y="318" width="452" height="290" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text class="heading" x="108" y="351">Layer 2 · Standalone Bridge</text>
+  <rect class="node" x="120" y="374" width="388" height="64" rx="10"/>
+  <text class="label" x="314" y="414">playmcp-bridge.js (Stdio)</text>
+  <path d="M314 490 476 536 314 582 152 536Z" fill="#fff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text class="label" x="314" y="543">만료 2시간 전 or 401?</text>
+
+  <rect class="group" x="654" y="318" width="378" height="552" rx="16" fill="#fefce8" stroke="#fde68a"/>
+  <text class="heading" x="674" y="351">Kakao PlayMCP Cloud</text>
+  <rect class="node" x="678" y="374" width="330" height="88" rx="10"/>
+  <text class="label" x="843" y="410">playmcp.kakao.com/mcp</text>
+  <text class="small" x="843" y="441">Gateway · 도구 실행</text>
+  <rect class="node" x="678" y="728" width="330" height="100" rx="10"/>
+  <text class="label" x="843" y="769">playauth.kakao.com</text>
+  <text class="small" x="843" y="801">OAuth2 · 토큰 갱신 및 회전</text>
+
+  <rect class="group" x="88" y="680" width="452" height="306" rx="16" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text class="heading" x="108" y="714">Layer 1 · Auto-Refresh Script</text>
+  <rect class="node" x="120" y="744" width="388" height="64" rx="10"/>
+  <text class="label" x="314" y="784">refresh-token.sh</text>
+  <path d="M120 890 C120 865 508 865 508 890 L508 944 C508 969 120 969 120 944Z" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+  <path d="M120 890 C120 915 508 915 508 890" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <text class="label" x="314" y="939">~/.mcporter/credentials.json</text>
+
+  <path class="edge" d="M314 232V370" marker-start="url(#arrow)"/>
+  <text class="edge-label" x="314" y="288">JSON-RPC Stdio</text>
+  <path class="edge" d="M512 406H674"/>
+  <text class="edge-label" x="593" y="393">도구 실행 요청</text>
+  <path class="edge dashed" d="M314 442V486"/>
+  <text class="edge-label" x="314" y="475">필요 시 확인</text>
+  <path class="edge refresh" d="M314 586V740"/>
+  <text class="edge-label" x="314" y="648">Yes · 온더플라이 갱신</text>
+
+  <path class="edge refresh" d="M843 232V286H586V708H490V740"/>
+  <text class="edge-label" x="586" y="641" transform="rotate(-90 586 641)">크론 정기 실행</text>
+
+  <path class="edge refresh" d="M512 762H674"/>
+  <text class="edge-label" x="593" y="748">토큰 갱신 요청</text>
+  <path class="edge refresh" d="M674 801H512"/>
+  <text class="edge-label" x="593" y="835">새 Access / Refresh</text>
+  <path class="edge refresh" d="M314 812V872"/>
+  <text class="edge-label" x="314" y="851">동기화</text>
+  <path class="edge dashed" d="M116 937H48V406H116"/>
+  <text class="edge-label" x="48" y="670" transform="rotate(-90 48 670)">최신 토큰 읽기</text>
+
+  <text x="680" y="921" font-size="17" fill="#475569">실선: 요청 및 토큰 갱신</text>
+  <text x="680" y="951" font-size="17" fill="#475569">점선: 조건 확인 및 토큰 읽기</text>
+</svg>

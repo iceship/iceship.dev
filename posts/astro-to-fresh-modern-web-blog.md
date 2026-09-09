@@ -5,8 +5,6 @@ summary: "Astro 블로그를 Deno Fresh 2로 마이그레이션하며 View Trans
 tags: ["fresh", "deno", "web-standards", "performance", "blog"]
 ---
 
-## TL;DR
-
 기존에 Bun + Astro 기반으로 운영하던 블로그를 **Deno 2 + Fresh 2** 환경으로
 완전히 이관했다. 이전하는 김에 구글의 최신 웹
 가이드라인(`modern-web-guidance`)을 적극 도입하여 다음 작업들을 한 번에 끝냈다:
