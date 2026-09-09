@@ -130,7 +130,7 @@ export default function SearchModal() {
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
-          class="w-5 h-5 text-neutral-400 shrink-0"
+          class="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0"
         >
           <path
             fillRule="evenodd"
@@ -178,9 +178,9 @@ export default function SearchModal() {
             key={post.slug}
             href={`/blog/${post.slug}`}
             onClick={closeModal}
-            class={`block p-3 rounded-lg text-left transition-colors ${
+            class={`block p-3 rounded-lg text-left transition-all ${
               idx === activeIndex
-                ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-950 dark:text-white"
+                ? "bg-indigo-50/90 dark:bg-indigo-950/40 text-neutral-950 dark:text-white border-l-2 border-indigo-500 dark:border-indigo-400 pl-3.5"
                 : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/60"
             }`}
           >
@@ -200,7 +200,7 @@ export default function SearchModal() {
                 {post.tags.map((tag) => (
                   <span
                     key={tag}
-                    class="text-[10px] px-1.5 py-0.5 rounded bg-neutral-200/60 dark:bg-neutral-700/60 text-neutral-600 dark:text-neutral-300"
+                    class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20"
                   >
                     #{tag}
                   </span>

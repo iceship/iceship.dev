@@ -26,7 +26,7 @@ export default function BackToTop() {
       onClick={scrollToTop}
       aria-label="맨 위로 가기"
       title="맨 위로 가기"
-      class={`back-to-top fixed bottom-6 right-6 z-40 flex items-center justify-center w-10 h-10 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 text-neutral-600 dark:text-neutral-300 shadow-sm hover:text-black dark:hover:text-white hover:border-neutral-400 dark:hover:border-neutral-600 backdrop-blur-md transition-all duration-300 ${
+      class={`back-to-top fixed bottom-6 right-6 z-40 flex items-center justify-center w-10 h-10 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 text-neutral-600 dark:text-neutral-300 shadow-sm hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-500/60 dark:hover:border-indigo-500/60 hover:shadow-indigo-500/10 backdrop-blur-md transition-all duration-300 ${
         visible
           ? "opacity-100 translate-y-0 pointer-events-auto"
           : "opacity-0 translate-y-3 pointer-events-none"

@@ -6,18 +6,49 @@ html {
   interpolate-size: allow-keywords;
 }
 
-/* 다크/라이트 맞춤 커스텀 스크롤바 */
+/* Electric Violet 시그니처 디자인 토큰 (Raycast / Linear 감성) */
 :root {
+  --accent-light: oklch(0.58 0.22 275);
+  --accent-light-hover: oklch(0.50 0.24 275);
+  --accent-dark: oklch(0.72 0.18 275);
+  --accent-dark-hover: oklch(0.80 0.14 275);
+
+  --accent: var(--accent-light);
+  --accent-hover: var(--accent-light-hover);
+  --accent-subtle: oklch(0.58 0.22 275 / 0.12);
+  --accent-border: oklch(0.58 0.22 275 / 0.3);
+
   --scrollbar-thumb: #d4d4d4;
   --scrollbar-thumb-hover: #a3a3a3;
   --scrollbar-track: transparent;
+
+  accent-color: var(--accent);
 }
 @media (prefers-color-scheme: dark) {
   :root {
+    --accent: var(--accent-dark);
+    --accent-hover: var(--accent-dark-hover);
+    --accent-subtle: oklch(0.72 0.18 275 / 0.16);
+    --accent-border: oklch(0.72 0.18 275 / 0.38);
+
     --scrollbar-thumb: #383838;
     --scrollbar-thumb-hover: #525252;
     --scrollbar-track: transparent;
   }
+}
+
+@supports (color: light-dark(black, white)) {
+  :root {
+    --accent: light-dark(var(--accent-light), var(--accent-dark));
+    --accent-hover: light-dark(var(--accent-light-hover), var(--accent-dark-hover));
+    --accent-subtle: light-dark(oklch(0.58 0.22 275 / 0.12), oklch(0.72 0.18 275 / 0.16));
+    --accent-border: light-dark(oklch(0.58 0.22 275 / 0.3), oklch(0.72 0.18 275 / 0.38));
+  }
+}
+
+::selection {
+  background: var(--accent-subtle);
+  color: var(--accent);
 }
 
 * {
@@ -258,6 +289,14 @@ body {
   font-size: 1rem;
   font-weight: 650;
   letter-spacing: -0.035em;
+  transition: opacity 0.15s ease;
+}
+.site-name .site-dot {
+  color: var(--accent);
+  transition: color 0.15s ease;
+}
+.site-name:hover .site-dot {
+  color: var(--accent-hover);
 }
 .site-nav,
 .site-footer nav {
@@ -271,11 +310,17 @@ body {
   min-height: 2.75rem;
   color: var(--muted);
   font-size: 0.875rem;
+  transition: color 0.15s ease;
+}
+.site-nav a:hover,
+.site-footer a:hover {
+  color: var(--accent-hover);
 }
 .site-nav a[data-current],
 .site-nav a[data-ancestor] {
   color: inherit;
   text-decoration: underline;
+  text-decoration-color: var(--accent);
   text-underline-offset: 0.5em;
 }
 a {
@@ -287,9 +332,9 @@ a:hover {
 a:focus-visible,
 button:focus-visible,
 summary:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 5px;
-  border-radius: 2px;
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 .page-content {
   padding-block: 3.5rem 1rem;
@@ -392,10 +437,17 @@ summary:focus-visible {
   min-height: 2.75rem;
   color: var(--muted);
   font-size: 0.875rem;
+  transition: color 0.15s ease;
+}
+.tag-filter a:hover {
+  color: var(--accent-hover);
 }
 .tag-filter a[aria-current="page"] {
-  color: inherit;
+  color: var(--accent);
+  font-weight: 600;
   text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.4em;
 }
 .post-title {
   margin-top: 1.5rem;
@@ -488,21 +540,21 @@ summary:focus-visible {
     overflow-wrap: anywhere;
   }
   .post-toc-link:hover {
-    color: #000000;
+    color: var(--accent-hover);
     text-decoration: none;
   }
   .post-toc-link.active {
-    color: #000000;
+    color: var(--accent);
     font-weight: 600;
   }
 }
 
 @media (prefers-color-scheme: dark) and (min-width: 1280px) {
   .post-toc-link:hover {
-    color: #ffffff;
+    color: var(--accent-hover);
   }
   .post-toc-link.active {
-    color: #ffffff;
+    color: var(--accent);
   }
 }
 .post-pagination {
@@ -657,18 +709,13 @@ summary:focus-visible {
       left: 0;
       width: 100%;
       height: 2px;
-      background: #171717;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-subtle);
       transform-origin: 0 50%;
       animation: reading-progress auto linear;
       animation-timeline: scroll();
       z-index: 50;
       pointer-events: none;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .reading-progress-bar {
-        background: #f5f5f5;
-      }
     }
   }
 }

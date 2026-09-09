@@ -9,7 +9,7 @@ export default function SearchTrigger() {
       onClick={handleClick}
       aria-label="글 검색 (단축키 ⌘K)"
       title="검색 (⌘K)"
-      class="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white px-2 py-1 rounded border border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors select-none"
+      class="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-indigo-600 dark:text-neutral-400 dark:hover:text-indigo-400 px-2 py-1 rounded border border-neutral-200 dark:border-neutral-800 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-colors select-none"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

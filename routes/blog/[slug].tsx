@@ -58,7 +58,17 @@ export default define.page(async function PostPage(ctx) {
         {post.tags.length > 0 && (
           <>
             <span>·</span>
-            <span>{post.tags.join(", ")}</span>
+            <span class="inline-flex flex-wrap gap-1.5 items-center">
+              {post.tags.map((t) => (
+                <a
+                  key={t}
+                  href={`/blog?tag=${encodeURIComponent(t)}`}
+                  class="text-xs px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/20 no-underline transition-colors"
+                >
+                  #{t}
+                </a>
+              ))}
+            </span>
           </>
         )}
       </div>
