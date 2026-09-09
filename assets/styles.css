@@ -349,6 +349,82 @@ summary:focus-visible {
 .post-toc summary {
   min-height: 1.75rem;
 }
+
+@media (min-width: 1280px) {
+  .post-toc {
+    display: none;
+  }
+}
+
+/* 데스크톱 오른쪽 고정 목차 사이드바 */
+.post-toc-sidebar {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .post-toc-sidebar {
+    display: block;
+    position: absolute;
+    left: calc(100% + 2rem);
+    top: 6rem;
+    width: 13.5rem;
+    bottom: 0;
+  }
+  .post-toc-sticky {
+    position: sticky;
+    top: 5rem;
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    padding-left: 0.875rem;
+    border-left: 1px solid var(--rule);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    scrollbar-width: thin;
+  }
+  .post-toc-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 0 0 0.75rem 0;
+  }
+  .post-toc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .post-toc-item.level-3 {
+    padding-left: 0.75rem;
+  }
+  .post-toc-link {
+    display: block;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    overflow-wrap: anywhere;
+  }
+  .post-toc-link:hover {
+    color: #000000;
+    text-decoration: none;
+  }
+  .post-toc-link.active {
+    color: #000000;
+    font-weight: 600;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (min-width: 1280px) {
+  .post-toc-link:hover {
+    color: #ffffff;
+  }
+  .post-toc-link.active {
+    color: #ffffff;
+  }
+}
 .post-pagination {
   margin-top: 3.5rem;
   padding-top: 1.5rem;

@@ -164,3 +164,13 @@ Deno.test("runtime keeps bad posts visible as errors and missing posts as 404 ca
     await Deno.remove(dir, { recursive: true });
   }
 });
+
+Deno.test("getPost rejects path traversal patterns with null", async () => {
+  const { getPost } = await import("../utils/posts.ts");
+  equal(await getPost("../deno.json"), null);
+  equal(await getPost("../../etc/passwd"), null);
+  equal(await getPost("sub/post"), null);
+  equal(await getPost("sub\\post"), null);
+  equal(await getPost("post\0name"), null);
+  equal(await getPost(""), null);
+});

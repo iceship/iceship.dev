@@ -120,13 +120,19 @@ async function renderMarkdown(
           text: string;
         },
       ) {
-        const isExternal = href.startsWith("http://") ||
-          href.startsWith("https://");
+        // javascript:, data:, vbscript: 등 위험한 프로토콜 차단
+        const sanitizedHref = /^(?:https?:\/\/|\/|#|mailto:)/i.test(href)
+          ? href
+          : "#";
+        const isExternal = sanitizedHref.startsWith("http://") ||
+          sanitizedHref.startsWith("https://");
         const titleAttr = title ? ` title="${escapeHtml(title)}"` : "";
         const externalAttrs = isExternal
           ? ' target="_blank" rel="noopener noreferrer"'
           : "";
-        return `<a href="${href}"${titleAttr}${externalAttrs}>${text}</a>`;
+        return `<a href="${
+          escapeHtml(sanitizedHref)
+        }"${titleAttr}${externalAttrs}>${text}</a>`;
       },
     },
   });
@@ -204,6 +210,17 @@ export async function getPosts(): Promise<PostMeta[]> {
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
+  // 경로 조작(Directory Traversal: .., /, \) 방지
+  if (
+    !slug ||
+    slug.includes("..") ||
+    slug.includes("/") ||
+    slug.includes("\\") ||
+    slug.includes("\0")
+  ) {
+    return null;
+  }
+
   const file = join(POSTS_DIR, `${slug}.md`);
   let stat: Deno.FileInfo;
   try {

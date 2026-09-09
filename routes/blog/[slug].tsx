@@ -3,6 +3,8 @@ import { Head } from "fresh/runtime";
 import { define } from "../../utils.ts";
 import { getPost, getPosts } from "../../utils/posts.ts";
 import CodeCopyHandler from "../../islands/CodeCopyHandler.tsx";
+import TocActiveHandler from "../../islands/TocActiveHandler.tsx";
+
 export default define.page(async function PostPage(ctx) {
   const slug = ctx.params.slug;
   const post = await getPost(slug);
@@ -18,7 +20,11 @@ export default define.page(async function PostPage(ctx) {
   const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
   return (
-    <main id="main-content" tabIndex={-1} class="site-shell page-content">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      class="site-shell page-content relative"
+    >
       <Head>
         <title>{post.title} — iceship.dev</title>
         <meta name="description" content={post.summary} />
@@ -56,32 +62,60 @@ export default define.page(async function PostPage(ctx) {
         )}
       </div>
 
-      {post.toc.length >= 3 && (
-        <details class="post-toc group/toc">
-          <summary class="font-semibold text-neutral-800 dark:text-neutral-200 cursor-pointer select-none flex items-center justify-between">
-            <span>목차</span>
-            <span class="text-xs text-neutral-400 transition-transform group-open/toc:rotate-180">
-              ▼
-            </span>
-          </summary>
-          <ul class="mt-3 space-y-1.5 pt-2 border-t border-neutral-200/60 dark:border-neutral-800">
-            {post.toc.map((item) => (
-              <li
-                key={item.id}
-                class={item.level === 3
-                  ? "ml-4 text-neutral-500 dark:text-neutral-400"
-                  : "text-neutral-700 dark:text-neutral-300"}
-              >
-                <a
-                  href={`#${item.id}`}
-                  class="hover:underline hover:text-black dark:hover:text-white"
+      {post.toc.length >= 2 && (
+        <>
+          <details class="post-toc group/toc xl:hidden">
+            <summary class="font-semibold text-neutral-800 dark:text-neutral-200 cursor-pointer select-none flex items-center justify-between">
+              <span>목차</span>
+              <span class="text-xs text-neutral-400 transition-transform group-open/toc:rotate-180">
+                ▼
+              </span>
+            </summary>
+            <ul class="mt-3 space-y-1.5 pt-2 border-t border-neutral-200/60 dark:border-neutral-800">
+              {post.toc.map((item) => (
+                <li
+                  key={item.id}
+                  class={item.level === 3
+                    ? "ml-4 text-neutral-500 dark:text-neutral-400"
+                    : "text-neutral-700 dark:text-neutral-300"}
                 >
-                  {item.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </details>
+                  <a
+                    href={`#${item.id}`}
+                    class="hover:underline hover:text-black dark:hover:text-white"
+                  >
+                    {item.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+
+          <aside class="post-toc-sidebar" aria-label="목차">
+            <div class="post-toc-sticky">
+              <p class="post-toc-title">목차</p>
+              <nav class="post-toc-nav">
+                <ul class="post-toc-list">
+                  {post.toc.map((item) => (
+                    <li
+                      key={item.id}
+                      class={item.level === 3
+                        ? "post-toc-item level-3"
+                        : "post-toc-item level-2"}
+                    >
+                      <a
+                        href={`#${item.id}`}
+                        class="post-toc-link"
+                        data-toc-id={item.id}
+                      >
+                        {item.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </aside>
+        </>
       )}
 
       <div
@@ -91,6 +125,7 @@ export default define.page(async function PostPage(ctx) {
       />
 
       <CodeCopyHandler />
+      <TocActiveHandler />
 
       <nav class="post-pagination" aria-label="다른 글">
         <span>
