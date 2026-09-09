@@ -3,7 +3,7 @@ import type { State } from "./utils.ts";
 
 export const app = new App<State>();
 
-// 보안 헤더 미들웨어 (MIME 스니핑 방지, 클릭재킹 방지, 리퍼러 보호 등)
+// 보안 헤더 및 정적 에셋 고속 캐싱 미들웨어
 app.use(async (ctx) => {
   const resp = await ctx.next();
   resp.headers.set("X-Content-Type-Options", "nosniff");
@@ -13,6 +13,29 @@ app.use(async (ctx) => {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
   );
+
+  // 정적 에셋 캐싱 최적화 (브라우저 및 Cloudflare CDN 엣지 캐시 극대화)
+  if (resp.status === 200) {
+    const pathname = ctx.url.pathname;
+    if (
+      pathname.startsWith("/images/") ||
+      pathname.startsWith("/favicon") ||
+      pathname === "/site.webmanifest" ||
+      pathname.startsWith("/apple-touch-icon") ||
+      pathname.startsWith("/web-app-manifest")
+    ) {
+      resp.headers.set(
+        "Cache-Control",
+        "public, max-age=86400, stale-while-revalidate=604800",
+      );
+    } else if (pathname.startsWith("/assets/")) {
+      resp.headers.set(
+        "Cache-Control",
+        "public, max-age=31536000, immutable",
+      );
+    }
+  }
+
   return resp;
 });
 

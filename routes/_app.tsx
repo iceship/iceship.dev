@@ -59,6 +59,40 @@ export default define.page(function App({ Component }) {
           content="#0a0a0a"
           media="(prefers-color-scheme: dark)"
         />
+        <script
+          type="speculationrules"
+          // deno-lint-ignore react-no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              prefetch: [
+                {
+                  source: "document",
+                  where: {
+                    and: [
+                      { href_matches: "/*" },
+                      { not: { href_matches: "/api/*" } },
+                      { not: { href_matches: "/rss.xml" } },
+                      { not: { href_matches: "/sitemap.xml" } },
+                    ],
+                  },
+                  eagerness: "moderate",
+                },
+              ],
+              prerender: [
+                {
+                  source: "document",
+                  where: {
+                    and: [
+                      { href_matches: "/blog/*" },
+                      { not: { href_matches: "/api/*" } },
+                    ],
+                  },
+                  eagerness: "conservative",
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body
         f-client-nav
