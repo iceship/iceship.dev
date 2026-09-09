@@ -25,6 +25,7 @@ export default define.page(async function PostPage(ctx) {
       tabIndex={-1}
       class="site-shell page-content relative"
     >
+      <div class="reading-progress-bar" aria-hidden="true" />
       <Head>
         <title>{post.title} — iceship.dev</title>
         <meta name="description" content={post.summary} />

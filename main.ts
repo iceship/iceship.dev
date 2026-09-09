@@ -16,6 +16,35 @@ app.use(async (ctx) => {
   return resp;
 });
 
+// /posts 경로 301 영구 리디렉션 미들웨어 (트레일링 슬래시 / 및 쿼리스트링 자동 처리)
+app.use(async (ctx) => {
+  const pathname = ctx.url.pathname;
+  if (pathname === "/posts" || pathname === "/posts/") {
+    return new Response(null, {
+      status: 301,
+      headers: {
+        Location: `/blog${ctx.url.search}`,
+        "Cache-Control": "public, max-age=86400, s-maxage=604800",
+      },
+    });
+  }
+  if (pathname.startsWith("/posts/")) {
+    let slug = pathname.slice("/posts/".length).replace(/\/+$/, "");
+    if (slug === "typescript-node.js-init") {
+      slug = "typescript-node-js-init";
+    }
+    const safeSlug = encodeURIComponent(slug);
+    return new Response(null, {
+      status: 301,
+      headers: {
+        Location: `/blog/${safeSlug}${ctx.url.search}`,
+        "Cache-Control": "public, max-age=86400, s-maxage=604800",
+      },
+    });
+  }
+  return await ctx.next();
+});
+
 app.use(staticFiles());
 
 // 파일 기반 라우트: routes/ 폴더가 자동으로 URL이 됨

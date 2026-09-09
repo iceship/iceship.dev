@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
-/* 스크롤바 유무로 인한 가로 shift 방지: 거터 항상 예약 */
+/* 스크롤바 유무로 인한 가로 shift 방지: 거터 항상 예약 & 키워드 크기 보간 */
 html {
   scrollbar-gutter: stable;
+  interpolate-size: allow-keywords;
 }
 
 /* 미니멀 블로그 본문 타이포 */
@@ -19,6 +20,7 @@ html {
   letter-spacing: -0.02em;
   margin: 2em 0 0.6em;
   line-height: 1.3;
+  text-wrap: balance;
 }
 .prose-blog h1 {
   font-size: 1.6rem;
@@ -32,6 +34,7 @@ html {
 .prose-blog p {
   margin: 1em 0;
   color: #262626;
+  text-wrap: pretty;
 }
 .prose-blog a {
   text-decoration: underline;
@@ -50,6 +53,7 @@ html {
 }
 .prose-blog li {
   margin: 0.3em 0;
+  text-wrap: pretty;
 }
 .prose-blog code {
   font-size: 0.88em;
@@ -71,6 +75,10 @@ html {
   background: transparent;
   padding: 0;
   color: inherit;
+}
+.prose-blog .code-block {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 12rem;
 }
 
 /* Prism.js 신택스 하이라이팅 토큰 */
@@ -262,6 +270,8 @@ summary:focus-visible {
 }
 .post-entry {
   border-bottom: 1px solid var(--rule);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 5.5rem;
 }
 .post-link {
   display: block;
@@ -287,6 +297,7 @@ summary:focus-visible {
   line-height: 1.6;
   overflow-wrap: anywhere;
   word-break: keep-all;
+  text-wrap: balance;
 }
 .post-entry time {
   flex-shrink: 0;
@@ -300,6 +311,7 @@ summary:focus-visible {
   line-height: 1.75;
   font-size: 0.9375rem;
   overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 .tag-filter {
   display: flex;
@@ -326,6 +338,7 @@ summary:focus-visible {
   line-height: 1.4;
   word-break: keep-all;
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .post-meta {
   display: flex;
@@ -556,5 +569,39 @@ summary:focus-visible {
     scroll-behavior: auto !important;
     transition: none !important;
     animation: none !important;
+  }
+}
+
+/* 0-JS 스크롤 읽기 진행률 바 (Scroll-driven animations) */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes reading-progress {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .reading-progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #171717;
+      transform-origin: 0 50%;
+      animation: reading-progress auto linear;
+      animation-timeline: scroll();
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .reading-progress-bar {
+        background: #f5f5f5;
+      }
+    }
   }
 }
