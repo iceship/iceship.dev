@@ -1,11 +1,13 @@
 import { App, staticFiles } from "fresh";
 import type { State } from "./utils.ts";
+import { cachePartialResponse } from "./utils/navigation.ts";
 
 export const app = new App<State>();
 
 // 보안 헤더 및 정적 에셋 고속 캐싱 미들웨어
 app.use(async (ctx) => {
   const resp = await ctx.next();
+  cachePartialResponse(ctx.req, resp);
   resp.headers.set("X-Content-Type-Options", "nosniff");
   resp.headers.set("X-Frame-Options", "DENY");
   resp.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");

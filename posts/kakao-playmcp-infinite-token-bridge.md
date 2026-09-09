@@ -141,9 +141,9 @@ Refresh Token을 교체 발급(Token Rotation)**해 주었다. 즉, 90일 만료
 결함이 있는 `mcporter daemon`을 완전히 걷어내고, 토큰 로테이션을 자동화하는
 3계층 아키텍처를 직접 구축했다.
 
-![AI 에이전트, 독립 브릿지, 토큰 갱신 스크립트와 6시간 주기 크론을 연결한 PlayMCP 구조](/images/blog/kakao-playmcp-token-bridge.svg)
+![AI 에이전트, 독립 브릿지, 토큰 갱신 스크립트와 6시간 주기 크론을 연결한 PlayMCP 구조](/images/blog/kakao-playmcp-token-bridge.svg?v=2)
 
-[흐름도 크게 보기](/images/blog/kakao-playmcp-token-bridge.svg)
+[흐름도 크게 보기](/images/blog/kakao-playmcp-token-bridge.svg?v=2)
 
 ### 계층 1: 토큰 회전 갱신 스크립트 (`refresh-token.sh`)
 
