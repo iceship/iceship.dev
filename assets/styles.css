@@ -137,17 +137,10 @@ html {
   margin: 1.4em 0;
   font-size: 0.88rem;
   line-height: 1.6;
-  -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% -
-    2.25rem), transparent 100%);
-  mask-image: linear-gradient(to right, black 0%, black calc(100% - 2.25rem),
-    transparent 100%);
 }
 .prose-blog pre code {
   background: transparent;
   padding: 0;
-  padding-right: 2.5rem;
-  display: inline-block;
-  min-width: 100%;
   color: inherit;
 }
 .prose-blog .code-block {
