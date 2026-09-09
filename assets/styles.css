@@ -1,9 +1,76 @@
 @import "tailwindcss";
 
-/* 스크롤바 유무로 인한 가로 shift 방지: 거터 항상 예약 & 키워드 크기 보간 */
+/* 스크롤바 유무로 인한 가로 shift 방지 & 키워드 크기 보간 */
 html {
   scrollbar-gutter: stable;
   interpolate-size: allow-keywords;
+}
+
+/* 다크/라이트 맞춤 커스텀 스크롤바 */
+:root {
+  --scrollbar-thumb: #d4d4d4;
+  --scrollbar-thumb-hover: #a3a3a3;
+  --scrollbar-track: transparent;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --scrollbar-thumb: #383838;
+    --scrollbar-thumb-hover: #525252;
+    --scrollbar-track: transparent;
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+}
+
+/* Cross-document View Transitions (0-JS MPA View Transitions) */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation: 140ms ease-out both fade-out;
+  }
+  ::view-transition-new(root) {
+    animation: 180ms ease-in both fade-in;
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /* 미니멀 블로그 본문 타이포 */
@@ -70,10 +137,17 @@ html {
   margin: 1.4em 0;
   font-size: 0.88rem;
   line-height: 1.6;
+  -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% -
+    2.25rem), transparent 100%);
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 2.25rem),
+    transparent 100%);
 }
 .prose-blog pre code {
   background: transparent;
   padding: 0;
+  padding-right: 2.5rem;
+  display: inline-block;
+  min-width: 100%;
   color: inherit;
 }
 .prose-blog .code-block {
@@ -603,5 +677,143 @@ summary:focus-visible {
         background: #f5f5f5;
       }
     }
+  }
+}
+
+/* 스크롤 리빌 카드 효과 (Scroll-driven animations) */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes card-entry-reveal {
+      from {
+        opacity: 0.3;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .post-entry {
+      animation: card-entry-reveal auto linear backwards;
+      animation-timeline: view(block);
+      animation-range: entry 0% cover 25%;
+    }
+  }
+}
+
+/* 검색 다이얼로그 모달 애니메이션 */
+dialog.search-dialog[open] {
+  animation: search-dialog-fade-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+dialog.search-dialog::backdrop {
+  animation: search-backdrop-fade-in 0.18s ease-out forwards;
+}
+
+@keyframes search-dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes search-backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 코드 복사 플로팅 토스트 애니메이션 */
+.copy-toast {
+  animation: toast-slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toast-slide-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* 클린 인쇄 & PDF 내보내기 최적화 모드 */
+@media print {
+  .site-header,
+  .site-footer,
+  .post-toc-sidebar,
+  .post-toc,
+  .reading-progress-bar,
+  .code-copy-btn,
+  .back-to-top,
+  .copy-toast,
+  .skip-link,
+  .heading-anchor,
+  .post-pagination,
+  .tag-filter,
+  dialog,
+  nav {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+  }
+
+  .site-shell,
+  .page-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .prose-blog p,
+  .prose-blog li {
+    color: #111 !important;
+  }
+
+  .prose-blog pre {
+    background: #f8f8f8 !important;
+    color: #111 !important;
+    border: 1px solid #ddd !important;
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    padding: 1rem !important;
+    page-break-inside: avoid;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  .prose-blog pre code {
+    color: #111 !important;
+    padding-right: 0 !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+    color: #000 !important;
+  }
+
+  article,
+  .post-body {
+    page-break-inside: auto;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: #000 !important;
   }
 }

@@ -2,6 +2,8 @@ import { Partial } from "fresh/runtime";
 import { define } from "../utils.ts";
 import { Header } from "../components/Header.tsx";
 import { Footer } from "../components/Footer.tsx";
+import SearchModal from "../islands/SearchModal.tsx";
+import BackToTop from "../islands/BackToTop.tsx";
 
 export default define.page(function App({ Component }) {
   return (
@@ -14,15 +16,26 @@ export default define.page(function App({ Component }) {
         <meta name="color-scheme" content="light dark" />
         <link
           rel="icon"
-          href="/favicon.ico?v=iceship-1"
-          sizes="16x16 32x32 48x48"
+          type="image/png"
+          href="/favicon-96x96.png"
+          sizes="96x96"
         />
         <link
           rel="icon"
-          href="/logo.svg?v=iceship-1"
           type="image/svg+xml"
-          sizes="any"
+          href="/favicon.svg"
         />
+        <link
+          rel="shortcut icon"
+          href="/favicon.ico"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <meta name="apple-mobile-web-app-title" content="iceship" />
+        <link rel="manifest" href="/site.webmanifest" />
         <link
           rel="alternate"
           type="application/rss+xml"
@@ -49,7 +62,7 @@ export default define.page(function App({ Component }) {
       </head>
       <body
         f-client-nav
-        f-view-transition={false}
+        f-view-transition
         class="bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100"
       >
         <a href="#main-content" class="skip-link">본문으로 건너뛰기</a>
@@ -57,6 +70,8 @@ export default define.page(function App({ Component }) {
           <Header />
           <Component />
           <Footer />
+          <BackToTop />
+          <SearchModal />
         </Partial>
       </body>
     </html>
