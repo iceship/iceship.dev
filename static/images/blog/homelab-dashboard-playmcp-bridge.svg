@@ -1,0 +1,264 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="980" viewBox="0 0 1160 980" role="img" aria-labelledby="title desc">
+  <title id="title">홈랩 대시보드 PlayMCP 3중 무중단 토큰 브릿지 아키텍처</title>
+  <desc id="desc">관리자 웹 브라우저에서 1회용 OTT를 입력하면 서버가 카카오 OAuth2와 직접 교환하여 영구 볼륨에 저장하고, 4시간 주기 백그라운드 회전, 2시간 전 온더플라이 사전 갱신, 401 감지 시 즉각 회전 재시도의 3중 안전망을 통해 Ollama 모닝 브리핑과 카카오맵 실시간 스팟 검색을 무중단으로 구동한다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse">
+      <path d="M0 0 8 4 0 8Z" fill="var(--edge)" />
+    </marker>
+    <marker id="blue-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0 8 4 0 8Z" fill="var(--accent)" />
+    </marker>
+    <marker id="green-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0 8 4 0 8Z" fill="var(--success)" />
+    </marker>
+    <marker id="amber-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0 8 4 0 8Z" fill="var(--warning)" />
+    </marker>
+    <style>
+      :root {
+        --canvas: #f8fafc;
+        --text: #0f172a;
+        --muted: #475569;
+        --node: #ffffff;
+        --border: #94a3b8;
+        --edge: #64748b;
+        --accent: #2563eb;
+        --success: #059669;
+        --warning: #d97706;
+        --browser: #f0fdf4;
+        --browser-border: #bbf7d0;
+        --server: #eff6ff;
+        --server-border: #bfdbfe;
+        --cloud: #fefce8;
+        --cloud-border: #fde68a;
+        --delivery: #faf5ff;
+        --delivery-border: #e9d5ff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --canvas: #0f172a;
+          --text: #f1f5f9;
+          --muted: #94a3b8;
+          --node: #1e293b;
+          --border: #475569;
+          --edge: #94a3b8;
+          --accent: #60a5fa;
+          --success: #34d399;
+          --warning: #fbbf24;
+          --browser: #064e3b22;
+          --browser-border: #05966955;
+          --server: #1e3a8a22;
+          --server-border: #3b82f655;
+          --cloud: #78350f22;
+          --cloud-border: #d9770655;
+          --delivery: #581c8722;
+          --delivery-border: #a855f755;
+        }
+      }
+      text {
+        font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+        fill: var(--text);
+      }
+      .heading {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .node {
+        fill: var(--node);
+        stroke: var(--border);
+        stroke-width: 1.5;
+      }
+      .label {
+        font-size: 15px;
+        font-weight: 600;
+        text-anchor: middle;
+      }
+      .sublabel {
+        font-size: 12px;
+        text-anchor: middle;
+        fill: var(--muted);
+      }
+      .edge {
+        fill: none;
+        stroke: var(--edge);
+        stroke-width: 2;
+        marker-end: url(#arrow);
+        stroke-linejoin: round;
+      }
+      .edge-blue {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 2;
+        marker-end: url(#blue-arrow);
+        stroke-linejoin: round;
+      }
+      .edge-green {
+        fill: none;
+        stroke: var(--success);
+        stroke-width: 2;
+        marker-end: url(#green-arrow);
+        stroke-linejoin: round;
+      }
+      .edge-amber {
+        fill: none;
+        stroke: var(--warning);
+        stroke-width: 2;
+        marker-end: url(#amber-arrow);
+        stroke-linejoin: round;
+      }
+      .dashed {
+        stroke-dasharray: 6 5;
+      }
+      .edge-label {
+        font-size: 12px;
+        font-weight: 600;
+        text-anchor: middle;
+        paint-order: stroke;
+        stroke: var(--canvas);
+        stroke-width: 6px;
+        stroke-linejoin: round;
+      }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1160" height="980" rx="20" fill="var(--canvas)" />
+
+  <!-- Header -->
+  <text x="44" y="48" font-size="24" font-weight="800">PlayMCP · 3중 무중단 토큰 브릿지 &amp; 홈랩 모닝 브리핑 아키텍처</text>
+  <text x="44" y="76" font-size="14" fill="var(--muted)">맥북 환경과 완전 격리된 서버 영구 볼륨 기반 3계층 무중단 자동 회전 및 실시간 로컬 스팟 발송 파이프라인</text>
+
+  <!-- 1. 관리자 브라우저 -->
+  <rect class="group" x="44" y="104" width="310" height="230" rx="14" fill="var(--browser)" stroke="var(--browser-border)" stroke-width="1.5" />
+  <text class="heading" x="64" y="136" fill="var(--success)">1. 관리자 웹 브라우저</text>
+  <rect class="node" x="64" y="156" width="270" height="66" rx="8" />
+  <text class="label" x="199" y="185">대시보드 웹 UI</text>
+  <text class="sublabel" x="199" y="206">AiDiagnosticsCard · 토큰 상태 배지</text>
+
+  <rect class="node" x="64" y="240" width="270" height="72" rx="8" />
+  <text class="label" x="199" y="269">원타임 토큰 (OTT) 등록 모달</text>
+  <text class="sublabel" x="199" y="291">PlayMCP 웹에서 복사한 OTT 입력</text>
+
+  <!-- 2. 홈랩 대시보드 서버 (LXC 54130) -->
+  <rect class="group" x="382" y="104" width="460" height="840" rx="14" fill="var(--server)" stroke="var(--server-border)" stroke-width="1.5" />
+  <text class="heading" x="404" y="136" fill="var(--accent)">2. homelab-dashboard (LXC 54130 · docker-01)</text>
+
+  <!-- API 엔드포인트 -->
+  <rect class="node" x="404" y="156" width="416" height="66" rx="8" />
+  <text class="label" x="612" y="185">POST /api/kakao/token</text>
+  <text class="sublabel" x="612" y="206">OTT 교환기 &amp; 토큰 라이프사이클 핸들러</text>
+
+  <!-- 영구 디스크 볼륨 -->
+  <path d="M404 270 C404 254 820 254 820 270 L820 326 C820 342 404 342 404 326 Z" fill="var(--node)" stroke="var(--border)" stroke-width="1.5" />
+  <path d="M404 270 C404 286 820 286 820 270" fill="none" stroke="var(--border)" stroke-width="1.5" />
+  <text class="label" x="612" y="302">/app/data/playmcp_tokens.json (SSOT)</text>
+  <text class="sublabel" x="612" y="322">호스트 영구 바인드 마운트 · Deno 비루트 UID 1993 격리</text>
+
+  <!-- 3-Tier Lifecycle Box -->
+  <rect x="404" y="356" width="416" height="236" rx="10" fill="var(--node)" stroke="var(--border)" stroke-width="1.5" />
+  <text class="heading" x="424" y="386" font-size="14" fill="var(--accent)">🛡️ 3계층 무중단 토큰 갱신 라이프사이클</text>
+
+  <!-- Tier 1 -->
+  <rect x="420" y="402" width="384" height="50" rx="6" fill="var(--server)" stroke="var(--server-border)" stroke-width="1" />
+  <text class="label" x="612" y="425" font-size="13">Tier 1 · 백그라운드 회전 크론 루프</text>
+  <text class="sublabel" x="612" y="443">4시간 주기 실행 · 만료 6시간 전 자동 회전 (90일 리셋)</text>
+
+  <!-- Tier 2 -->
+  <rect x="420" y="460" width="384" height="50" rx="6" fill="var(--server)" stroke="var(--server-border)" stroke-width="1" />
+  <text class="label" x="612" y="483" font-size="13">Tier 2 · 온더플라이 사전 검증 (ensureValidTokens)</text>
+  <text class="sublabel" x="612" y="501">도구 호출 직전 잔여시간 점검 · 만료 2시간 전 선제 갱신</text>
+
+  <!-- Tier 3 -->
+  <rect x="420" y="518" width="384" height="58" rx="6" fill="var(--server)" stroke="var(--server-border)" stroke-width="1" />
+  <text class="label" x="612" y="542" font-size="13">Tier 3 · 401 반응형 자동 복구 &amp; 1회 재시도</text>
+  <text class="sublabel" x="612" y="561">게이트웨이 401 반환 시 토큰 강제 회전 후 단 1회 무중단 재호출</text>
+
+  <!-- 모닝 브리핑 엔진 -->
+  <rect class="node" x="404" y="612" width="416" height="96" rx="8" />
+  <text class="label" x="612" y="642">일일 아침 브리핑 엔진 (runMorningBriefing)</text>
+  <text class="sublabel" x="612" y="665">Ollama (LXC 550 · gemma4:e2b-it-qat · num_predict: 2048)</text>
+  <text class="sublabel" x="612" y="687">Proxmox 클러스터 4개 노드 + 새벽 PBS 백업 + HA 스마트홈</text>
+
+  <!-- 다단계 실시간 동네 스팟 검색 -->
+  <rect class="node" x="404" y="728" width="416" height="96" rx="8" />
+  <text class="label" x="612" y="757">다단계 실시간 동네 스팟 검색 (fetchDynamicLocalSpot)</text>
+  <text class="sublabel" x="612" y="780">판교동 / 판교역로 / 판교역 POI 다단계 질의</text>
+  <text class="sublabel" x="612" y="802">줄 단위 구조적 파서 · 도로명 주소 기반 도보 시간 동적 산출</text>
+
+  <!-- 3. 카카오 PlayMCP 클라우드 인프라 -->
+  <rect class="group" x="868" y="104" width="248" height="520" rx="14" fill="var(--cloud)" stroke="var(--cloud-border)" stroke-width="1.5" />
+  <text class="heading" x="888" y="136" fill="var(--warning)">3. Kakao PlayMCP</text>
+
+  <!-- Auth Server -->
+  <rect class="node" x="888" y="156" width="208" height="150" rx="8" />
+  <text class="label" x="992" y="196">playauth.kakao.com</text>
+  <text class="sublabel" x="992" y="222">OAuth2 인증 서버</text>
+  <text class="sublabel" x="992" y="246">• OTT 1회용 토큰 교환</text>
+  <text class="sublabel" x="992" y="268">• Token Rotation</text>
+  <text class="sublabel" x="992" y="290">(새 Access + 새 Refresh)</text>
+
+  <!-- MCP Gateway -->
+  <rect class="node" x="888" y="340" width="208" height="260" rx="8" />
+  <text class="label" x="992" y="380">playmcp.kakao.com</text>
+  <text class="sublabel" x="992" y="406">MCP Gateway /mcp</text>
+  <text class="sublabel" x="992" y="440">JSON-RPC 도구 호출</text>
+  <text class="sublabel" x="992" y="474" font-weight="600" fill="var(--text)">KakaoMap</text>
+  <text class="sublabel" x="992" y="496">실시간 키워드 장소 검색</text>
+  <text class="sublabel" x="992" y="534" font-weight="600" fill="var(--text)">KakaotalkChat</text>
+  <text class="sublabel" x="992" y="556">나와의 채팅방 (MemoChat)</text>
+
+  <!-- 4. 발송 채널 (배달지) -->
+  <rect class="group" x="44" y="650" width="310" height="294" rx="14" fill="var(--delivery)" stroke="var(--delivery-border)" stroke-width="1.5" />
+  <text class="heading" x="64" y="682" fill="#9333ea">4. 최종 발송 채널</text>
+
+  <rect class="node" x="64" y="702" width="270" height="106" rx="8" />
+  <text class="label" x="199" y="734">카카오톡 나와의 채팅방</text>
+  <text class="sublabel" x="199" y="757">200자 압축 핵심 요약</text>
+  <text class="sublabel" x="199" y="779">날씨 + 인프라 + 동네 스팟 카카오맵 링크</text>
+
+  <rect class="node" x="64" y="824" width="270" height="104" rx="8" />
+  <text class="label" x="199" y="856">Discord 브리핑 채널</text>
+  <text class="sublabel" x="199" y="879">Sunrise Gold 임베드</text>
+  <text class="sublabel" x="199" y="901">Ollama 3문단 완성형 본문 + 인프라 지표</text>
+
+  <!-- 화살표 및 연결선들 -->
+  <!-- OTT 흐름: UI -> API -->
+  <path class="edge-green" d="M334 276 H370 V189 H404" />
+  <text class="edge-label" x="368" y="235">OTT 전송</text>
+
+  <!-- OTT 교환: API -> Auth -->
+  <path class="edge-amber" d="M820 189 H888" />
+  <text class="edge-label" x="854" y="177">OTT 교환</text>
+
+  <!-- 신규 토큰 발급: Auth -> Disk Volume -->
+  <path class="edge-blue" d="M888 230 H852 V298 H820" />
+  <text class="edge-label" x="856" y="260">회전 토큰 저장</text>
+
+  <!-- 디스크 볼륨 -> 3-Tier 읽기 -->
+  <path class="edge dashed" d="M612 342 V356" />
+
+  <!-- 3-Tier -> OAuth 갱신 요청 -->
+  <path class="edge-amber" d="M804 427 H850 V210 H888" />
+  <text class="edge-label" x="850" y="320">토큰 회전 갱신</text>
+
+  <!-- 스팟 검색: 동네스팟 -> MCP Gateway -->
+  <path class="edge-blue" d="M820 776 H854 V460 H888" />
+  <text class="edge-label" x="854" y="580">장소 검색 요청</text>
+
+  <!-- 브리핑 엔진 -> 동네 스팟 호출 -->
+  <path class="edge" d="M612 708 V728" />
+
+  <!-- 브리핑 엔진 -> 나와의 채팅방 전송 (Gateway 경유) -->
+  <path class="edge-amber" d="M820 660 H844 V540 H888" />
+  <text class="edge-label" x="846" y="605">나챗방 전송</text>
+
+  <!-- 브리핑 엔진 -> Discord 발송 -->
+  <path class="edge" d="M404 660 H370 V876 H334" />
+  <text class="edge-label" x="368" y="770">디스코드 발송</text>
+
+  <!-- 카카오톡 발송 완료 반영선 (가상 연결) -->
+  <path class="edge-green dashed" d="M888 560 H860 V890 H440 V755 H334" />
+  <text class="edge-label" x="612" y="890">카카오톡 모바일 알림 도착 (200자 제한)</text>
+
+</svg>
