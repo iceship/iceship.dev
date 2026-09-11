@@ -157,7 +157,7 @@ async function renderMarkdown(
     },
   });
 
-  const contentHtml = await marked.parse(body, { breaks: true });
+  const contentHtml = await marked.parse(body, { breaks: false });
   return {
     contentHtml: typeof contentHtml === "string" ? contentHtml : "",
     toc,

@@ -18,9 +18,13 @@
       ]
     }
   },
+  "fmt": {
+    "proseWrap": "preserve"
+  },
   "exclude": [
     "**/_fresh/*",
-    "vite.config.ts"
+    "vite.config.ts",
+    "posts/**"
   ],
   "imports": {
     "@/": "./",
