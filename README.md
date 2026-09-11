@@ -2,9 +2,9 @@
 
 [iceship.dev](https://iceship.dev)는 **Deno 2**와 **Fresh 2.x** 기반으로 구축된
 고성능 미니멀 개인 기술 블로그입니다.\
-글은 마크다운 파일(`posts/*.md`)로 관리되며, Git에 커밋하는 것만으로 자동
-배포됩니다. 본문은 **서버 렌더링(SSR)**으로 제공하고, 페이지 전환에는 Fresh의
-Partial 런타임을, 코드 복사에는 **Island 아키텍처**를 사용합니다.
+글은 연도별 마크다운 파일(`posts/YYYY/*.md`)로 관리되며, Git에 커밋하는 것만으로
+자동 배포됩니다. 본문은 **서버 렌더링(SSR)**으로 제공하고, 페이지 전환에는
+Fresh의 Partial 런타임을, 코드 복사에는 **Island 아키텍처**를 사용합니다.
 
 ---
 
@@ -118,8 +118,12 @@ Partial 런타임을, 코드 복사에는 **Island 아키텍처**를 사용합�
 ├── islands/
 │   └── CodeCopyHandler.tsx    # 코드 블록 복사 이벤트 위임 처리 Island (클라이언트 하이드레이션)
 ├── posts/                     # 블로그 포스트 마크다운 파일 (.md)
-│   ├── hello.md
-│   └── how-to-write.md
+│   ├── 2025/                  # 2025년 작성 글 (연도별 아카이브)
+│   │   ├── about-blog.md
+│   │   └── proxmox-console-autologin.md
+│   └── 2026/                  # 2026년 작성 글 (필요 시 2026/09/ 등 월별 폴더도 자동 지원)
+│       ├── hello.md
+│       └── matter-thread-multi-border-router-recovery.md
 ├── routes/
 │   ├── _app.tsx               # 최상위 HTML 껍질 (Head, 메타태그, 파비콘, 레이아웃)
 │   ├── _error.tsx             # Fresh 2 통합 에러 페이지 (404 Not Found 및 500 에러)
@@ -183,52 +187,112 @@ deno task start
 
 ## 글 작성 가이드
 
-`posts/` 폴더에 `[슬러그].md` 파일을 추가하면 별도의 빌드 과정 없이 파일명이 곧
-게시글의 URL이 됩니다.\
-예: `posts/getting-started-deno.md` →
-`https://iceship.dev/blog/getting-started-deno`
+`posts/` 디렉터리 내에 연도별 폴더(예: `posts/2026/`)를 만들고 `[슬러그].md`
+파일을 추가하면 별도의 설정 없이 파일명이 곧 게시글의 고유 URL이 됩니다.\
+예: `posts/2026/matter-thread-recovery.md` →
+`https://iceship.dev/blog/matter-thread-recovery`
 
-### Front-matter 명세
+> [!TIP]
+>
+> - **계층 디렉터리 지원**: `posts/2026/글이름.md`는 물론, 글이 많아질 경우
+>   `posts/2026/09/글이름.md`처럼 월별 서브폴더를 두어도 로더가 재귀적으로 자동
+>   인식합니다.
+> - **URL 불변성**: 파일이 어느 연도/월 폴더에 있든 실제 블로그 URL은 언제나
+>   간결한 `/blog/[slug]` 형태로 서비스됩니다.
+> - **슬러그 고유성**: 서로 다른 연도 폴더에 있더라도 파일명(slug)은 고유해야
+>   합니다. 중복된 슬러그가 존재할 경우 사전 빌드
+>   검증(`deno task validate:posts`) 단계에서 즉시 감지하여 차단합니다.
 
-`title`, `date`, `summary`는 필수입니다. 제목과 요약은 비어 있지 않은 문자열,
-날짜는 따옴표로 감싼 `"YYYY-MM-DD"` 형식이어야 합니다. 존재하지 않는 날짜 (예:
-`"2026-02-30"`)는 허용하지 않습니다. `tags`는 생략하거나 문자열 배열로
-작성합니다. 같은 날짜의 글은 파일명(slug) 오름차순으로 정렬합니다.
+---
 
-`deno task validate:posts`로 모든 글을 검사할 수 있습니다. 오류가 있으면
-파일명과 이유를 모두 출력하며, `deno task build`도 이 검사를 먼저 실행합니다.
-CI와 배포 서비스가 같은 빌드 명령을 사용하므로 잘못된 글은 빌드를 통과하지
-못합니다. 검증 및 글 로딩 회귀 테스트는 `deno task test`로 실행합니다.
+### 마크다운 포맷 명세 (Markdown Format)
 
-글 상단에 아래 형식의 YAML Front-matter를 작성합니다:
+글은 최상단 **YAML Front-matter**와 본문 **GitHub Flavored Markdown(GFM)**으로
+구성됩니다.
+
+#### 1. Front-matter 필드 규칙
+
+| 필드      | 필수 여부 | 타입       | 형식 및 설명                                                                                                                           |
+| :-------- | :-------: | :--------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`   | **필수**  | `string`   | 글 제목 (따옴표로 감싸기)                                                                                                              |
+| `date`    | **필수**  | `string`   | 발행일. **반드시 따옴표로 감싼 `"YYYY-MM-DD"` 문자열** (예: `"2026-09-11"`, 따옴표 누락 시 YAML 파서가 Date 객체로 해석하여 빌드 실패) |
+| `summary` | **필수**  | `string`   | 글 목록 카드 및 SNS OpenGraph 요약문 (`description`이 아닌 `summary` 사용)                                                             |
+| `tags`    |   선택    | `string[]` | 태그 목록. 소문자/케밥케이스 인라인 배열 권장 (예: `["proxmox", "ha", "zfs"]`)                                                         |
+
+_(참고: `draft` 등의 미정의 필드는 지원하지 않으므로 포함하지 않습니다.)_
+
+#### 2. 본문 작성 규격
+
+- **헤딩 및 접이식 목차(TOC)**:
+  - 본문 대제목은 이미 페이지 헤더로 출력되므로, 본문 소제목은 `##` (h2) 또는
+    `###` (h3)부터 시작합니다.
+  - `##`, `###` 헤딩은 본문 상단 반응형 목차(TOC)에 자동 수집되며, 마우스 호버
+    시 링크 복사용 `#` 앵커가 자동 생성됩니다.
+- **코드 블록 및 원클릭 복사**:
+  - 코드 블록에 언어 식별자(`bash`, `typescript`, `javascript`, `json`, `yaml`,
+    `markdown`, `css` 등)를 지정하면 서버 사이드 신택스 하이라이팅과 우측 상단
+    `Copy` 버튼이 자동 활성화됩니다.
+- **이미지 및 캡션 렌더링**:
+  - `![대체 텍스트 및 캡션](/images/blog/example.webp)`
+  - 마크다운 대체 텍스트(alt)를 작성하면 이미지 하단에 `<figcaption>` 캡션이
+    자동으로 생성됩니다.
+  - 이미지는 `static/images/blog/`에 저장하며, `loading="lazy"`와
+    `decoding="async"`가 자동 적용됩니다.
+- **안전한 외부 링크**:
+  - `https://...` 형식의 외부 링크는 보안을 위해
+    `target="_blank" rel="noopener noreferrer"`가 자동 부여됩니다.
+  - `javascript:`, `data:` 등 잠재적 위험 프로토콜은 자동으로 `#` 처리됩니다.
+
+---
+
+### 마크다운 템플릿 예시
+
+새 글을 작성할 때 아래 템플릿을 복사하여 `posts/YYYY/slug-name.md`로 저장하세요:
 
 ````markdown
 ---
-title: "포스트 제목"
-date: "2026-09-07"
-tags: ["deno", "fresh", "typescript"]
-summary: "글 목록 카드 및 SNS 공유 메타태그(og:description)에 노출될 요약문"
+title: "게시글 제목을 입력하세요"
+date: "2026-09-11"
+tags: ["proxmox", "linux", "automation"]
+summary: "글 목록 카드 및 SNS 공유 메타태그에 노출될 1~2줄 요약문입니다."
 ---
 
-본문은 GitHub Flavored Markdown(GFM) 규격을 따릅니다.
+글 도입부 본문입니다. GitHub Flavored Markdown(GFM) 표준 문법을 따릅니다.
 
-## 1. 헤딩과 목차
+> 참고 메모나 주의사항은 인용 블록을 사용합니다.
 
-`##`, `###` 헤딩은 자동으로 고유 id가 생성되어 목차(TOC)와 `#` 앵커 링크로
-연결됩니다.
+## 1. 첫 번째 주제 (h2)
 
-## 2. 코드 블록
+설명 텍스트입니다. 링크는 [Deno 공식 문서](https://deno.com)처럼 작성하면 외부
+링크가 새 창으로 열립니다.
 
-코드 블록 언어 태그를 지정하면 서버 사이드 신택스 하이라이팅과 우측 상단 복사
-버튼이 자동으로 적용됩니다:
+### 1.1 하위 세부 내용 (h3)
 
-```typescript
-function greet(name: string): string {
-  return `Hello, ${name}!`;
-}
-console.log(greet("Deno"));
+코드 예시입니다:
+
+```bash
+# 명령어 실행 예시
+deno task check
 ```
+
+## 2. 두 번째 주제
+
+이미지는 다음과 같이 첨부합니다:
+
+![시스템 아키텍처 다이어그램](/images/blog/architecture-sample.webp)
 ````
+
+---
+
+### 글 검증 및 테스트 명령어
+
+```bash
+# 1. 모든 포스트의 Front-matter 무결성, 날짜 형식, 중복 슬러그 일괄 검증
+deno task validate:posts
+
+# 2. 포스트 로더 및 단위 테스트 실행
+deno task test
+```
 
 ---
 

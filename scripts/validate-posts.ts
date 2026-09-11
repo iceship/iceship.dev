@@ -1,18 +1,42 @@
-import { join } from "@std/path";
+import { basename, join } from "@std/path";
 import { parsePostSource, postFileError } from "../utils/post-source.ts";
 
 export async function validatePosts(directory: string) {
   const files: string[] = [];
-  try {
-    for await (const entry of Deno.readDir(directory)) {
-      if (entry.isFile && entry.name.endsWith(".md")) {
-        files.push(join(directory, entry.name));
+
+  async function walk(currentDir: string) {
+    for await (const entry of Deno.readDir(currentDir)) {
+      const fullPath = join(currentDir, entry.name);
+      if (entry.isDirectory) {
+        await walk(fullPath);
+      } else if (entry.isFile && entry.name.endsWith(".md")) {
+        files.push(fullPath);
       }
     }
+  }
+
+  try {
+    await walk(directory);
   } catch (error) {
     throw postFileError(directory, error);
   }
+
   files.sort();
+
+  const seenSlugs = new Map<string, string>();
+  const duplicateErrors: string[] = [];
+  for (const file of files) {
+    const slug = basename(file, ".md");
+    const existing = seenSlugs.get(slug);
+    if (existing) {
+      duplicateErrors.push(
+        `${file}: 중복된 slug "${slug}"가 발견되었습니다 (이미 "${existing}"에서 사용 중)`,
+      );
+    } else {
+      seenSlugs.set(slug, file);
+    }
+  }
+
   const results = await Promise.allSettled(files.map(async (file) => {
     try {
       parsePostSource(await Deno.readTextFile(file), file);
@@ -20,9 +44,11 @@ export async function validatePosts(directory: string) {
       throw postFileError(file, error);
     }
   }));
-  const errors = results.flatMap((result) =>
+  const parseErrors = results.flatMap((result) =>
     result.status === "rejected" ? [String(result.reason.message)] : []
   );
+
+  const errors = [...duplicateErrors, ...parseErrors].sort();
   return { count: files.length, errors };
 }
 

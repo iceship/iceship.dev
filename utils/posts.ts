@@ -1,4 +1,9 @@
-import { comparePosts, parsePostSource, postFileError } from "./post-source.ts";
+import {
+  comparePosts,
+  parsePostSource,
+  postFileError,
+  PostValidationError,
+} from "./post-source.ts";
 import { join } from "@std/path";
 import { Marked } from "marked";
 import Prism from "prismjs";
@@ -161,20 +166,91 @@ async function renderMarkdown(
 
 // NOTE: import.meta.url 기준(../posts) 쓰면 `vite build` 후 _fresh/server 번들에서
 // 경로가 깨져 Deploy에서 500이 난다. Deno.cwd() = 프로젝트 루트 기준이 안전하다.
-const POSTS_DIR = join(Deno.cwd(), "posts");
+function getPostsDir(): string {
+  return join(Deno.cwd(), "posts");
+}
 
-async function readSlugs(): Promise<string[]> {
-  const slugs: string[] = [];
-  try {
-    for await (const entry of Deno.readDir(POSTS_DIR)) {
-      if (entry.isFile && entry.name.endsWith(".md")) {
-        slugs.push(entry.name.replace(/\.md$/, ""));
+export interface PostFileEntry {
+  slug: string;
+  filePath: string;
+}
+
+let slugPathCache: Map<string, string> | null = null;
+
+export async function readPostEntries(
+  dir: string = getPostsDir(),
+): Promise<PostFileEntry[]> {
+  const entries: PostFileEntry[] = [];
+  const seen = new Map<string, string>();
+
+  async function walk(currentDir: string) {
+    for await (const entry of Deno.readDir(currentDir)) {
+      const fullPath = join(currentDir, entry.name);
+      if (entry.isDirectory) {
+        await walk(fullPath);
+      } else if (entry.isFile && entry.name.endsWith(".md")) {
+        const slug = entry.name.replace(/\.md$/, "");
+        const existing = seen.get(slug);
+        if (existing) {
+          throw new PostValidationError(fullPath, [
+            `중복된 slug "${slug}"가 발견되었습니다. 이미 "${existing}"에서 사용 중입니다.`,
+          ]);
+        }
+        seen.set(slug, fullPath);
+        entries.push({ slug, filePath: fullPath });
       }
     }
-  } catch (error) {
-    throw postFileError(POSTS_DIR, error);
   }
-  return slugs;
+
+  try {
+    await walk(dir);
+  } catch (error) {
+    throw postFileError(dir, error);
+  }
+
+  if (dir === getPostsDir()) {
+    slugPathCache = seen;
+  }
+
+  return entries;
+}
+
+async function findPostFile(slug: string): Promise<string | null> {
+  const postsDir = getPostsDir();
+
+  // 1. 루트에 직접 존재하는지 먼저 확인 (디렉토리 에러 유도 포함)
+  const rootCandidate = join(postsDir, `${slug}.md`);
+  try {
+    const stat = await Deno.stat(rootCandidate);
+    if (!stat.isDirectory) {
+      return rootCandidate;
+    }
+    // 디렉토리인 경우 readTextFile 단계에서 에러가 발생하도록 반환
+    return rootCandidate;
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) {
+      throw postFileError(rootCandidate, error);
+    }
+  }
+
+  // 2. 캐시된 slugPathCache 확인
+  if (slugPathCache && slugPathCache.has(slug)) {
+    return slugPathCache.get(slug)!;
+  }
+
+  // 3. 캐시가 없거나 미스된 경우 재귀 스캔 수행
+  try {
+    await readPostEntries(postsDir);
+    if (slugPathCache && slugPathCache.has(slug)) {
+      return slugPathCache.get(slug)!;
+    }
+  } catch (error) {
+    if (error instanceof PostValidationError) throw error;
+    if (error instanceof Deno.errors.NotFound) return null;
+    throw error;
+  }
+
+  return null;
 }
 
 interface CachedPost {
@@ -191,13 +267,12 @@ const postDetailCache = new Map<string, CachedPost>();
 const postMetaCache = new Map<string, CachedMeta>();
 
 export async function getPosts(): Promise<PostMeta[]> {
-  const slugs = await readSlugs();
+  const entries = await readPostEntries();
 
   const posts = await Promise.all(
-    slugs.map(async (slug) => {
-      const file = join(POSTS_DIR, `${slug}.md`);
+    entries.map(async ({ slug, filePath }) => {
       try {
-        const stat = await Deno.stat(file);
+        const stat = await Deno.stat(filePath);
         const mtime = stat.mtime?.getTime() ?? 0;
 
         const cached = postMetaCache.get(slug);
@@ -205,8 +280,8 @@ export async function getPosts(): Promise<PostMeta[]> {
           return cached.meta;
         }
 
-        const raw = await Deno.readTextFile(file);
-        const { fields, body } = parsePostSource(raw, file);
+        const raw = await Deno.readTextFile(filePath);
+        const { fields, body } = parsePostSource(raw, filePath);
         const meta: PostMeta = {
           slug,
           ...fields,
@@ -216,7 +291,7 @@ export async function getPosts(): Promise<PostMeta[]> {
         postMetaCache.set(slug, { mtime, meta });
         return meta;
       } catch (error) {
-        throw postFileError(file, error);
+        throw postFileError(filePath, error);
       }
     }),
   );
@@ -236,7 +311,9 @@ export async function getPost(slug: string): Promise<Post | null> {
     return null;
   }
 
-  const file = join(POSTS_DIR, `${slug}.md`);
+  const file = await findPostFile(slug);
+  if (!file) return null;
+
   let stat: Deno.FileInfo;
   try {
     stat = await Deno.stat(file);

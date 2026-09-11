@@ -174,3 +174,76 @@ Deno.test("getPost rejects path traversal patterns with null", async () => {
   equal(await getPost("post\0name"), null);
   equal(await getPost(""), null);
 });
+
+Deno.test("runtime supports posts in year-based and nested subdirectories", async () => {
+  const dir = await Deno.makeTempDir();
+  const originalDir = Deno.cwd();
+  try {
+    await Deno.mkdir(join(dir, "posts", "2025"), { recursive: true });
+    await Deno.mkdir(join(dir, "posts", "2026", "09"), { recursive: true });
+    Deno.chdir(dir);
+    const { getPosts, getPost } = await import(
+      `../utils/posts.ts?t=${Date.now()}`
+    );
+    await Deno.writeTextFile(
+      join(dir, "posts", "2025", "old-post.md"),
+      source({ title: "2025 글", date: "2025-11-20" }),
+    );
+    await Deno.writeTextFile(
+      join(dir, "posts", "2026", "09", "new-post.md"),
+      source({ title: "2026 글", date: "2026-09-11" }),
+    );
+    await Deno.writeTextFile(
+      join(dir, "posts", "root-post.md"),
+      source({ title: "루트 글", date: "2026-01-01" }),
+    );
+
+    const posts = await getPosts();
+    equal(posts.length, 3);
+    deepEqual(
+      posts.map((p: { slug: string }) => p.slug),
+      ["new-post", "root-post", "old-post"],
+    );
+
+    const loadedOld = await getPost("old-post");
+    equal(loadedOld?.title, "2025 글");
+    const loadedNew = await getPost("new-post");
+    equal(loadedNew?.title, "2026 글");
+    const loadedRoot = await getPost("root-post");
+    equal(loadedRoot?.title, "루트 글");
+  } finally {
+    Deno.chdir(originalDir);
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
+Deno.test("duplicate slugs in different subdirectories are rejected", async () => {
+  const dir = await Deno.makeTempDir();
+  const originalDir = Deno.cwd();
+  try {
+    await Deno.mkdir(join(dir, "posts", "2025"), { recursive: true });
+    await Deno.mkdir(join(dir, "posts", "2026"), { recursive: true });
+    await Deno.writeTextFile(
+      join(dir, "posts", "2025", "same-slug.md"),
+      source({ title: "2025 버전", date: "2025-01-01" }),
+    );
+    await Deno.writeTextFile(
+      join(dir, "posts", "2026", "same-slug.md"),
+      source({ title: "2026 버전", date: "2026-01-01" }),
+    );
+
+    const result = await validatePosts(join(dir, "posts"));
+    equal(result.count, 2);
+    equal(result.errors.length, 1);
+    match(result.errors[0], /중복된 slug "same-slug"/);
+
+    Deno.chdir(dir);
+    const { getPosts } = await import(
+      `../utils/posts.ts?t=${Date.now() + 1}`
+    );
+    await rejects(() => getPosts(), /중복된 slug "same-slug"/);
+  } finally {
+    Deno.chdir(originalDir);
+    await Deno.remove(dir, { recursive: true });
+  }
+});
