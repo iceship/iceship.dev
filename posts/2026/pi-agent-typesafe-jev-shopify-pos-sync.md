@@ -210,10 +210,10 @@ $ psql -h 10.200.x.x -U shop_pos_admin -d pos_dev -c "SELECT p.name, v.name as v
 
      name      | variant | cost_amount_minor | amount_minor | compare_at_amount_minor |    barcode    
 ---------------+---------+-------------------+--------------+-------------------------+---------------
- Hestia Hoodie | L       |              3850 |        12900 |                   14900 | 9300000000028
- Hestia Hoodie | M       |              3850 |        12900 |                   14900 | 9300000000011
- Hestia Mug    | Default |               610 |         2499 |                    2999 | 9300000000059
- Hestia Tee    | S       |               820 |         3900 |                         | 9300000000035
+ Lumora Hoodie | L       |              3850 |        12900 |                   14900 | 9300000000028
+ Lumora Hoodie | M       |              3850 |        12900 |                   14900 | 9300000000011
+ Lumora Mug    | Default |               610 |         2499 |                    2999 | 9300000000059
+ Lumora Tee    | S       |               820 |         3900 |                         | 9300000000035
 (4 rows)
 ```
 

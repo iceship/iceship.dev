@@ -236,7 +236,7 @@ export default {
 ## 5막: 검증의 축제 (68개 E2E + 실 PostgreSQL 리허설)
 
 아무리 로컬에서 예뻐 보여도 검증 통과 못 하면 배포할 수 없습니다.
-저희는 Tailwind v4 마이그레이션 전용 검증 스위트([`tailwind-pilot.spec.ts`](file:///Users/iceship/code/hestianco/hestianco-platform/apps/pos-kiosk/tests/e2e/tailwind-pilot.spec.ts))를 새로 추가했습니다:
+저희는 Tailwind v4 마이그레이션 전용 검증 스위트(`apps/pos-kiosk/tests/e2e/tailwind-pilot.spec.ts`)를 새로 추가했습니다:
 
 1. **지오메트리 보존**: 파일럿 버튼이 정확히 40x40px을 유지하는지, 배지 폰트가 정확한지 확인.
 2. **접근성 포커스 링**: Tab 키로 진입했을 때 다크 모드에서는 핑크빛 포커스 링(`--tw-ring-color: #f4a8b3`), 라이트 모드에서는 와인빛 포커스 링(`--tw-ring-color: #b51f32`)이 정확히 반응하는지 검증.
@@ -245,7 +245,7 @@ export default {
 그리고 터미널에서 전체 검증을 돌렸습니다:
 
 ```bash
-pnpm --filter @hestianco/pos-kiosk test:e2e
+pnpm --filter @lumoraco/pos-kiosk test:e2e
 ```
 
 ```text
